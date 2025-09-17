@@ -1,0 +1,24 @@
+.hero{
+    width: 100%;
+
+    background-image: url('../../assets/cityBackground.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+
+}
+
+.hero_text{
+
+}
+
+.hero_text-h1{
+    color: white;
+}
+
+.hero_text-h2{
+    color: white;
+}
+
+.hero_img{
+    max-width: 500px;
+}
