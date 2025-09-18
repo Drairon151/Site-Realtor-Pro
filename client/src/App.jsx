@@ -11,8 +11,10 @@ function App() {
       <Header/>
 
       <main>
+        
         <Home/>
-      </main>
+
+      </main> 
 
       <Footer/>
     </>

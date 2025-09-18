@@ -1,4 +1,6 @@
 import './Header.css'
+import siteLogo from '../../assets/siteLogo.png'
+
 import { menuItems } from "../../data"
 
 import HeaderMenuLi from "../headerMenuLi"
@@ -10,7 +12,7 @@ export default function Header(){
         <header className="header flex">
 
             <a className='flex center' href="#">
-                <img className="header_logo" src="" alt="Лого"/>
+                <img className="header_logo" src={siteLogo} alt="Лого"/>
                 <p className="header_logo-text">Бизнес профи</p>
             </a>
 
