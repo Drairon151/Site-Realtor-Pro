@@ -1,0 +1,16 @@
+.features-section{
+    width: 100%;
+    min-height: 500px;
+}
+
+.features-section_title{
+    /* max-width: 800px; */
+    padding: 50px ;
+    font-size: 30px;
+}
+
+.features{
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+}

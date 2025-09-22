@@ -1,0 +1,17 @@
+.features_cards-card{
+    max-width: 300px;
+}
+
+.features_cards-icon{
+    height: 50px;
+}
+
+.features_cards-title{
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.features_cards-text{
+    padding-top: 5px;
+    font-size: 15px;
+}

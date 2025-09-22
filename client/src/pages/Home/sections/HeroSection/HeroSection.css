@@ -1,0 +1,30 @@
+.hero{
+    height: 500px;
+    width: 100%;
+    background: 
+        linear-gradient(rgba(0, 0, 0, 0.719), rgba(0, 0, 0, 0.322)),
+        url('../../../../assets/img/homePage/cityBackground.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+
+}
+
+.hero_text{
+    padding-top: 60px;
+    padding-left: 60px;
+}
+
+.hero_text-h1{
+    font-size: 50px;
+    color: white;
+}
+
+.hero_text-p{
+    font-size: 30px;
+    padding-top:20px ;
+    color: white;
+}
+
+.hero_img{
+    max-width: 500px;
+}
