@@ -3,11 +3,20 @@ import Login from "./Login/Login";
 import Modal from "../Modal/Modal";
 import Registration from "./Registration/Registration";
 import './Authorization.css'
+
 import { useState } from "react";
+import useAuth from "../../hooks/useAuth";
 
 export default function Authorization(){
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [modalFormType, setModalFormType] = useState()
+
+    const [
+        registration,
+        login,
+        isLoading,
+        error,
+    ] = useAuth()
 
     function openModalForm(formType){
         setModalFormType(formType)
@@ -27,9 +36,14 @@ export default function Authorization(){
             <Modal isOpen={isModalOpen} onClose={closeModalForm}>
                 {
                     modalFormType === 'register' ?
-                        <Registration onClose={closeModalForm}/> :
+                        <Registration 
+                            registration={registration}
+                            onClose={closeModalForm}/> :
+                            
                             modalFormType === 'login'?
-                            <Login onClose={closeModalForm}/> : null
+                            <Login
+                                login={login}
+                                onClose={closeModalForm}/> : null
                     
                 }
             </Modal>

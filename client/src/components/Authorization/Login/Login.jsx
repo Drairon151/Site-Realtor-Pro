@@ -1,4 +1,4 @@
-export default function Login({userLogin}){
+export default function Login({login, onClose}){
     return(
         <>
             <form id="form-auth">
@@ -9,6 +9,10 @@ export default function Login({userLogin}){
                 <input id="form-auth_input" type="password"></input>
 
                 <button id="form-auth_button">Отправить</button>
+
+                <button onClick={login} id="form-auth_button">Отправить</button>
+
+                <button onClick={onClose} id="form-auth_button">✖️</button>
 
             </form>
         </>

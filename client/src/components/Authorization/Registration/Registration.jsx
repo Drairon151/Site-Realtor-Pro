@@ -1,22 +1,25 @@
-export default function Registration({userRegistration}){
+export default function Registration({registration, onClose}){
     return(
         <>
-            <form id="form-auth">
+            <form id="form-auth" onSubmit={(event)=>{
+                event.preventDefault()
+                registration(event)
+            }}>
                 <label id="form-auth_lable">Имя:</label>
-                <input id="form-auth_input" type="text"></input>
+                <input name="userName" id="form-auth_input" type="text"></input>
 
                 <label id="form-auth_lable">Email:</label>
-                <input id="form-auth_input" type="email"></input>
+                <input name="mail" id="form-auth_input" type="email"></input>
 
                 <label id="form-auth_lable">Номер телефона:</label>
-                <input id="form-auth_input" type="number"></input>
+                <input name="numberPhone" id="form-auth_input" type="number"></input>
 
                 <label id="form-auth_lable">Пароль:</label>
-                <input id="form-auth_input" type="password"></input>
+                <input name="password" id="form-auth_input" type="password"></input>
 
-                <button id="form-auth_button">Отправить</button>
+                <button type="submit" id="form-auth_button">Отправить</button>
 
-                {/* <input id="form-auth_input"  type="button">Отправить</input> */}
+                <button onClick={onClose} id="form-auth_button">✖️</button>
             </form>
         </>
     )
