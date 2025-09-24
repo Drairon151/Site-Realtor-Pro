@@ -25,9 +25,8 @@ export default function Header(){
                 ))}
             </ul>
 
-            {
-                true && <Authorization/>
-            }
+                <Authorization/>
+            
 
         </header>
     )

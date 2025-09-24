@@ -12,7 +12,7 @@ export default function Registration({registration, onClose}){
                 <input name="mail" id="form-auth_input" type="email"></input>
 
                 <label id="form-auth_lable">Номер телефона:</label>
-                <input name="numberPhone" id="form-auth_input" type="number"></input>
+                <input name="numberPhone" id="form-auth_input" type="text"></input>
 
                 <label id="form-auth_lable">Пароль:</label>
                 <input name="password" id="form-auth_input" type="password"></input>

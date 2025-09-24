@@ -1,23 +1,26 @@
-import { useState } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css'
 import Header from './components/Header/Header'
 import Footer from './components/Footer/Footer'
 import Home from './pages/Home/Home'
+import Profile from './pages/Profile/Profile'
 
 function App() {
 
   return (
-    <>
+    <BrowserRouter>
       <Header/>
+        <main>
+          
+          <Routes>
+            <Route path="/" element={<Home />} />
 
-      <main>
-        
-        <Home/>
+            <Route path="/Profile" element={<Profile/>} />
+          </Routes>
 
-      </main> 
-
+        </main> 
       <Footer/>
-    </>
+    </BrowserRouter>
   )
 }
 

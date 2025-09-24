@@ -4,7 +4,7 @@ import Modal from "../Modal/Modal";
 import Registration from "./Registration/Registration";
 import './Authorization.css'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 
 export default function Authorization(){
@@ -16,6 +16,7 @@ export default function Authorization(){
         login,
         isLoading,
         error,
+        currentUser
     ] = useAuth()
 
     function openModalForm(formType){
@@ -30,23 +31,35 @@ export default function Authorization(){
 
     return(
         <div className="flex center">
-            <Button buttonClick={()=>{openModalForm('register')}}>Регистрация</Button>
-            <Button buttonClick={()=>{openModalForm('login')}}>Вход</Button>
-            
-            <Modal isOpen={isModalOpen} onClose={closeModalForm}>
-                {
-                    modalFormType === 'register' ?
-                        <Registration 
-                            registration={registration}
-                            onClose={closeModalForm}/> :
-                            
-                            modalFormType === 'login'?
-                            <Login
-                                login={login}
-                                onClose={closeModalForm}/> : null
-                    
-                }
-            </Modal>
+            {
+                isLoading ?(
+                    <p>Загрузка...</p>
+                ): currentUser ? (
+                    <button>{currentUser.userName}</button>
+                ):(
+                    <>
+                        <Button buttonClick={()=>{openModalForm('register')}}>Регистрация</Button>
+                        <Button buttonClick={()=>{openModalForm('login')}}>Вход</Button>
+                        
+                        <Modal isOpen={isModalOpen} onClose={closeModalForm}>
+                            {
+                                modalFormType === 'register' ?
+                                    <Registration 
+                                        registration={registration}
+                                        onClose={closeModalForm}
+                                    /> :
+                                        
+                                    modalFormType === 'login'?
+                                        <Login
+                                            login={login}
+                                            onClose={closeModalForm}
+                                    /> : null
+                                
+                            }
+                        </Modal>
+                    </>
+                )
+            }
         </div>
     )
 }

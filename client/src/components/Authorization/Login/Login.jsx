@@ -8,8 +8,6 @@ export default function Login({login, onClose}){
                 <label id="form-auth_lable">Пароль:</label>
                 <input id="form-auth_input" type="password"></input>
 
-                <button id="form-auth_button">Отправить</button>
-
                 <button onClick={login} id="form-auth_button">Отправить</button>
 
                 <button onClick={onClose} id="form-auth_button">✖️</button>
