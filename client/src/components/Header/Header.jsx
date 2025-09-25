@@ -10,12 +10,12 @@ export default function Header(){
     return(
         <header className="header flex">
 
-            <a className='flex center' href="#">
+            <a className='flex center' href="/">
                 <img className="header_logo" src={siteLogo} alt="Лого"/>
                 <p className="header_logo-text">Риэлтор профи</p>
             </a>
 
-            <ul className="header_menu flex center">
+            {/* <ul className="header_menu flex center">
                 {menuItems.map(item=>(
                     <HeaderMenuLi 
                                 nameClass={item.nameClass}
@@ -23,7 +23,7 @@ export default function Header(){
                                 text={item.text}
                     ></HeaderMenuLi>
                 ))}
-            </ul>
+            </ul> */}
 
                 <Authorization/>
             

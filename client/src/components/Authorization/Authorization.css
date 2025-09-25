@@ -1,4 +1,4 @@
-#form-auth{
+.form-auth{
     max-width: 500px;
     min-width: 300px;
 
@@ -17,17 +17,17 @@
     box-sizing: border-box;
 }
 
-#form-auth_lable{
+.form-auth_lable{
     display: block;
     margin-bottom: 5px;
 }
 
-#form-auth_input{
+.form-auth_input{
     border-radius: 50px;
     padding: 5px;
 }
 
-#form-auth_button{
+.form-auth_button{
     border-radius: 50px;
     padding: 10px;
 
@@ -39,7 +39,7 @@
     color: white;
 }
 
-#form-auth_button:hover{
+.form-auth_button:hover{
     transition: 1s;
 
     background-color: white;

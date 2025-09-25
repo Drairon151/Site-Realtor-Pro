@@ -2,8 +2,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css'
 import Header from './components/Header/Header'
 import Footer from './components/Footer/Footer'
-import Home from './pages/Home/Home'
-import Profile from './pages/Profile/Profile'
+import HomePage from './pages/HomePage/HomePage'
+import ProfilePage from './pages/ProfilePage/ProfilePage'
+import RegistrationPage from './pages/AuthorizationPages/RegistrationPage/RegistrationPage';
+import LoginPage from './pages/AuthorizationPages/LoginPage/LoginPage';
 
 function App() {
 
@@ -13,9 +15,11 @@ function App() {
         <main>
           
           <Routes>
-            <Route path="/" element={<Home />} />
-
-            <Route path="/Profile" element={<Profile/>} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/RegistrationPage" element={<RegistrationPage/>} />
+            <Route path="/LoginPage" element={<LoginPage/>} />
+            <Route path="/Profile" element={<ProfilePage/>} />
+            
           </Routes>
 
         </main> 

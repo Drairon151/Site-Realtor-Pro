@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 export default function useAuth(){
-    
+
     const [user, setUser] = useState({
         userName: null,
         mail: null,
@@ -14,10 +14,10 @@ export default function useAuth(){
 
     const [currentUser, setCurrentUser] = useState(null);
 
-    // Проверка авторизации при загрузке
     useEffect(() => {
         const checkAuth = async () => {
         try {
+            setIsLoading(true)
             const response = await fetch('http://localhost:5000/api/me', {
             method: 'GET',
             credentials: 'include',
@@ -29,11 +29,15 @@ export default function useAuth(){
             }
 
             const data = await response.json();
-            setCurrentUser(data.user); // сохраним данные
-            setUser(prev => ({ ...prev, ...data.user })); // обновим форму
+            setCurrentUser(data.user);
+            setUser(prev => ({ ...prev, ...data.user }));
+
         } catch (err) {
             console.error('Ошибка проверки авторизации:', err);
             setCurrentUser(null);
+        }finally{
+            setIsLoading(false)
+            console.log('Файнали выполнился')
         }
         };
 
@@ -41,6 +45,7 @@ export default function useAuth(){
     }, []);
 
     const registration = async (event)=>{
+        event.preventDefault()
         setError(null);
         setIsLoading(true)
 
@@ -66,7 +71,7 @@ export default function useAuth(){
             })
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({})); // безопасно парсим
+                const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.message || 'Ошибка регистрации');
             }
 
@@ -83,6 +88,7 @@ export default function useAuth(){
     }
 
     const login = async (event)=>{
+        event.preventDefault()
         setIsLoading(true)
 
         const formData = new FormData(event.target);
@@ -123,13 +129,18 @@ export default function useAuth(){
         }
     }
 
-    return [        
+    const logout = async ()=>{
+        fetch(`${API_AUTH}/logout`)
+    }
+
+    return {        
         registration,
         login,
+        logout,
 
         isLoading,
         error,
         currentUser,
-    ]
+    }
     
 }

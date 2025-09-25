@@ -1,4 +1,4 @@
-import './Home.css'
+import './HomePage.css'
 import FeaturesSection from './sections/FeaturesSection/FeaturesSection'
 import HeroSection from './sections/HeroSection/HeroSection'
 
