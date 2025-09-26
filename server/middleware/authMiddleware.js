@@ -2,29 +2,56 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const authMiddleware = (req, res, next) => {
-  // 1. Получаем токен из заголовка
-  const authHeader = req.headers.authorization;
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Требуется авторизация' });
+const authMiddleware = async (req, res, next) => {
+  console.log('\n🔐 === ПРОВЕРКА АВТОРИЗАЦИИ ===');
+
+  // 1. Проверяем, есть ли куки вообще
+  console.log('🍪 req.cookies:', req.cookies);
+
+  const token = req.cookies.token;
+
+  if (!token) {
+    console.log('❌ Токен не найден в куках');
+    return res.status(401).json({
+      status: 'error',
+      type: 'no_token',
+      message: 'Требуется авторизация'
+    });
   }
 
-  const token = authHeader.split(' ')[1]; // после "Bearer"
+  console.log('✅ Токен найден:', token.substring(0, 20) + '...');
 
   try {
-    // 2. Проверяем токен
+    // 2. Проверяем и расшифровываем JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // 3. Добавляем данные пользователя в запрос
-    req.user = decoded; // теперь можно использовать req.user.userId, req.user.role
-    
+    console.log('✅ Токен валиден. Расшифрован:', decoded);
+
+    // 3. Сохраняем данные пользователя в запрос
+    req.user = decoded;
     next(); // разрешаем доступ к маршруту
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
-      return res.status(401).json({ message: 'Срок действия токена истёк' });
+      console.log('⏰ Токен просрочен');
+      return res.status(401).json({
+        status: 'error',
+        type: 'token_expired',
+        message: 'Срок действия токена истёк'
+      });
+    } else if (err.name === 'JsonWebTokenError') {
+      console.log('❌ Неверный формат токена');
+      return res.status(403).json({
+        status: 'error',
+        type: 'invalid_token',
+        message: 'Неверный токен'
+      });
+    } else {
+      console.error('💥 Ошибка проверки токена:', err.message);
+      return res.status(403).json({
+        status: 'error',
+        type: 'server_error',
+        message: 'Ошибка проверки токена'
+      });
     }
-    return res.status(403).json({ message: 'Неверный токен' });
   }
 };
 

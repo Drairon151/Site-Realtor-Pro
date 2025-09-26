@@ -1,4 +1,4 @@
-export default function Registration({registration, onClose}){
+export default function Registration({registration}){
     return(
         <>
             <form className="form-auth" onSubmit={registration}>
@@ -15,8 +15,6 @@ export default function Registration({registration, onClose}){
                 <input name="password" className="form-auth_input" type="password"></input>
 
                 <button type="submit" className="form-auth_button">Отправить</button>
-
-                {/* <button onClick={onClose} className="form-auth_button">✖️</button> */}
             </form>
         </>
     )

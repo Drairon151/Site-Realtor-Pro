@@ -27,33 +27,30 @@ const generateToken = (user) => {
 
 // Регистрация
 const register = async (req, res) => {
-  console.log('\n🔧 === НАЧАЛО РЕГИСТРАЦИИ ===');
-  console.log('📥 Получены данные:', req.body);
-
+  console.log('\n🔧 === РЕГИСТРАЦИЯ ===');
   const { userName, mail, numberPhone, password, role = 'client' } = req.body;
 
   if (!userName || !mail || !password) {
-    console.log('❌ Ошибка: Не все обязательные поля заполнены');
     return res.status(400).json({
-      message: 'Имя, email и пароль обязательны',
+      status: 'error',
+      type: 'missing_data',
+      message: 'Имя, email и пароль обязательны'
     });
   }
 
   try {
     const existingUser = await User.findOne({ mail });
     if (existingUser) {
-      console.log(`❌ Пользователь с email ${mail} уже существует`);
       return res.status(400).json({
-        message: 'Пользователь с такой почтой уже зарегистрирован',
+        status: 'error',
+        type: 'user_exists',
+        message: 'Пользователь с такой почтой уже существует'
       });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log('✅ Пароль захеширован');
-
     const verificationCode = crypto.randomInt(100000, 999999).toString();
-    const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
-    console.log('🔢 Код подтверждения:', verificationCode);
+    const verificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 минут
 
     const user = new User({
       userName,
@@ -62,46 +59,49 @@ const register = async (req, res) => {
       password: hashedPassword,
       role,
       verificationCode,
-      verificationCodeExpires,
+      verificationCodeExpires: verificationExpires,
       isVerified: false,
     });
 
     await user.save();
-    console.log('✅ Пользователь сохранён:', user._id);
+    console.log('✅ Пользователь создан:', user._id);
 
-    // 🚀 ГЕНЕРИРУЕМ ТОКЕН И УСТАНАВЛИВАЕМ КУКУ (как при входе)
-    const token = generateToken(user);
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    // 🕒 ЗАПУСКАЕМ ТАЙМЕР НА УДАЛЕНИЕ
+    const cleanupTimer = setTimeout(async () => {
+      try {
+        const freshUser = await User.findById(user._id);
+        if (freshUser && !freshUser.isVerified) {
+          await User.deleteOne({ _id: user._id });
+          console.log(`❌ Пользователь ${user.mail} удалён по таймауту`);
+        }
+      } catch (err) {
+        console.error('Ошибка при удалении пользователя:', err);
+      }
+    }, 10 * 60 * 1000); // 10 минут
+
+    // Сохраняем таймер в памяти сервера (или используй Redis в продакшене)
+    // Для простоты — временно храним в глобальном объекте
+    if (!global.verificationTimers) global.verificationTimers = {};
+    global.verificationTimers[user._id] = cleanupTimer;
 
     // 📧 Отправляем письмо
     const emailSent = await sendVerificationEmail(mail, verificationCode);
     if (!emailSent) {
       console.log('⚠️ Не удалось отправить письмо');
-    } else {
-      console.log('✅ Письмо отправлено');
     }
 
-    // 📦 ОТПРАВЛЯЕМ ДАННЫЕ ПОЛЬЗОВАТЕЛЯ
+    // ✅ Возвращаем ответ
     res.status(201).json({
-      message: 'Регистрация успешна. Проверьте почту для подтверждения.',
-      user: {
-        _id: user._id,
-        userName: user.userName,
-        mail: user.mail,
-        role: user.role,
-        isVerified: user.isVerified, // → false
-      },
+      status: 'success',
+      message: 'Регистрация успешна. Подтвердите email.',
+      userId: user._id,
     });
   } catch (err) {
     console.error('💥 Ошибка при регистрации:', err.message);
     res.status(500).json({
-      message: 'Ошибка сервера при регистрации',
-      error: err.message,
+      status: 'error',
+      type: 'server_error',
+      message: 'Ошибка сервера'
     });
   }
 };
@@ -176,15 +176,102 @@ const login = async (req, res) => {
 
 // Подтверждение email по коду
 const verifyEmail = async (req, res) => {
-  console.log('\n📧 === ПОДТВЕРЖДЕНИЕ EMAIL ===');
-  console.log('📥 Получен запрос:', req.body);
-
   const { userId, code } = req.body;
 
   if (!userId || !code) {
-    console.log('❌ Не хватает данных: userId или code');
     return res.status(400).json({
-      message: 'Требуются userId и код',
+      status: 'error',
+      type: 'missing_data',
+      message: 'Требуются userId и код'
+    });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: 'error',
+        type: 'not_found',
+        message: 'Пользователь не найден'
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(200).json({
+        status: 'success',
+        type: 'already_verified',
+        message: 'Email уже подтверждён'
+      });
+    }
+
+    if (user.verificationCode !== code) {
+      return res.status(400).json({
+        status: 'error',
+        type: 'invalid_code',
+        message: 'Неверный код'
+      });
+    }
+
+    if (Date.now() > user.verificationCodeExpires) {
+      // ❌ Код истёк → удаляем пользователя
+      await User.deleteOne({ _id: userId });
+
+      // Очищаем таймер, если он ещё работает
+      if (global.verificationTimers?.[userId]) {
+        clearTimeout(global.verificationTimers[userId]);
+        delete global.verificationTimers[userId];
+      }
+
+      return res.status(400).json({
+        status: 'error',
+        type: 'expired',
+        message: 'Срок действия кода истёк. Пожалуйста, зарегистрируйтесь снова.'
+      });
+    }
+
+    // ✅ Успешное подтверждение
+    user.isVerified = true;
+    user.verificationCode = null;
+    user.verificationCodeExpires = null;
+    await user.save();
+
+    // 🛑 Отменяем таймер
+    if (global.verificationTimers?.[userId]) {
+      clearTimeout(global.verificationTimers[userId]);
+      delete global.verificationTimers[userId];
+    }
+
+    res.status(200).json({
+      status: 'success',
+      type: 'verified',
+      message: 'Email успешно подтверждён!',
+      user: {
+        _id: user._id,
+        userName: user.userName,
+        mail: user.mail,
+        role: user.role,
+        isVerified: true,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      type: 'server_error',
+      message: 'Ошибка сервера'
+    });
+  }
+};
+
+const resendVerificationCode = async (req, res) => {
+  console.log('\n🔄 === ПОВТОРНАЯ ОТПРАВКА КОДА ===');
+  const { userId } = req.body;
+
+  if (!userId) {
+    console.log('❌ Ошибка: userId не указан');
+    return res.status(400).json({
+      status: 'error',
+      type: 'missing_data',
+      message: 'Требуется userId'
     });
   }
 
@@ -193,49 +280,72 @@ const verifyEmail = async (req, res) => {
     if (!user) {
       console.log('❌ Пользователь не найден');
       return res.status(404).json({
-        message: 'Пользователь не существует',
+        status: 'error',
+        type: 'not_found',
+        message: 'Пользователь не существует'
       });
     }
 
     if (user.isVerified) {
       console.log('✅ Email уже подтверждён');
       return res.status(200).json({
-        message: 'Email уже подтверждён',
+        status: 'success',
+        type: 'already_verified',
+        message: 'Email уже подтверждён'
       });
     }
 
-    if (user.verificationCode !== code) {
-      console.log('❌ Неверный код');
+    // ⏱️ Проверка: прошло ли 60 секунд с последней отправки?
+    const now = new Date();
+    const MINUTES_1 = 60 * 1000;
+    if (user.verificationCodeExpires && now < user.verificationCodeExpires) {
+      const remainingSeconds = Math.ceil((user.verificationCodeExpires - now) / 1000);
+      console.log(`⏰ Код ещё действует. Осталось ${remainingSeconds} сек.`);
       return res.status(400).json({
-        message: 'Неверный код подтверждения',
+        status: 'error',
+        type: 'cooldown',
+        message: `Подождите ${remainingSeconds} секунд`,
+        cooldown: remainingSeconds
       });
     }
 
-    if (Date.now() > user.verificationCodeExpires) {
-      console.log('⏰ Код истёк');
-      return res.status(400).json({
-        message: 'Код подтверждения истёк. Запросите новый.',
-      });
-    }
+    // 🔄 Генерируем новый код
+    const verificationCode = crypto.randomInt(100000, 999999).toString();
+    const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000); // +10 минут
 
-    // Подтверждаем email
-    user.isVerified = true;
-    user.verificationCode = null;
-    user.verificationCodeExpires = null;
+    // Сохраняем в базу
+    user.verificationCode = verificationCode;
+    user.verificationCodeExpires = verificationCodeExpires;
     await user.save();
 
-    console.log('✅ Email успешно подтверждён!');
-    res.json({
-      message: 'Email подтверждён. Теперь можно войти.',
+    // 📧 Отправляем письмо
+    const emailSent = await sendVerificationEmail(user.mail, verificationCode);
+
+    if (!emailSent) {
+      console.log('❌ Не удалось отправить письмо');
+      return res.status(500).json({
+        status: 'error',
+        type: 'email_failed',
+        message: 'Не удалось отправить письмо. Попробуйте позже.'
+      });
+    }
+
+    console.log('✅ Новый код отправлен на', user.mail);
+    res.status(200).json({
+      status: 'success',
+      type: 'resend_success',
+      message: 'Код отправлен повторно'
     });
   } catch (err) {
-    console.error('💥 Ошибка при подтверждении:', err.message);
+    console.error('💥 Ошибка при повторной отправке:', err.message);
     res.status(500).json({
-      message: 'Ошибка сервера при подтверждении',
-      error: err.message,
+      status: 'error',
+      type: 'server_error',
+      message: 'Ошибка сервера'
     });
   }
 };
+
 
 // Выход
 const logout = (req, res) => {
@@ -251,5 +361,6 @@ module.exports = {
   register,
   login,
   verifyEmail,
-  logout, // ← не забудь экспортировать
+  logout,
+  resendVerificationCode,
 };
