@@ -3,20 +3,23 @@ import { useState, useEffect } from "react";
 export default function useAuth(){
 
     const [user, setUser] = useState({
-        userId : null,
+        _id : null,
+        role: null,
         userName: null,
         mail: null,
         numberPhone: null,
-        password: null,
     })
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState(false)
-    const API_AUTH = 'http://localhost:5000/api/auth';
-    const [currentUser, setCurrentUser] = useState(null);
     const [emailAuthStatus, setEmailAuthStatus] = useState({
         status:'not-sent',
         type:null,
     });
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState(false)
+
+
+
+    const API_AUTH = 'http://localhost:5000/api/auth';
+
 
 
     useEffect(() => {
@@ -33,14 +36,13 @@ export default function useAuth(){
             }
 
             const result = await response.json();
-            setCurrentUser(result.user);
-            setUser(prev => ({ ...prev, ...result.user }));
+            console.log('Результат в проверка авторизации: ',result.user)
+            setUser(result.user);
 
         } catch (err) {
-            setCurrentUser(null);
+            setUser(null);
         }finally{
             setIsLoading(false)
-            console.log('Файнали выполнился')
         }
         };
 
@@ -60,8 +62,6 @@ export default function useAuth(){
             numberPhone: formData.get('numberPhone'),
             password: formData.get('password'),
         };
-        
-        setUser(prev => ({ ...prev, ...userData }));
 
         try{
             const response = await fetch(`${API_AUTH}/register`,{
@@ -77,12 +77,6 @@ export default function useAuth(){
                 const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.message || 'Ошибка регистрации');
             }
-
-            const result = await response.json();
-            console.log('Всякие данные в регистер\n', result)
-            setCurrentUser(result.user);
-            console.log('Активный пользователь\n', currentUser)
-            setUser(prev => ({ ...prev, mail: result.user.mail }));
             setEmailAuthStatus({status:'wait-email-conf', type:'wait'})
             }catch(error){
                 setError(error.message)
@@ -103,13 +97,8 @@ export default function useAuth(){
             password: formData.get('password'),
         };
 
-        setUser(prev =>({ 
-            ...prev,
-            ...userData
-        }))
-
         try{
-            let response = await fetch(`${API_AUTH}/login`,{
+            const response = await fetch(`${API_AUTH}/login`,{
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json',
@@ -126,9 +115,11 @@ export default function useAuth(){
                 throw new Error(response.message || 'Ошибка входа в аккаунт');
             }
 
+            const result = await response.json()
+
             window.location.href = '/';
             
-            setUser(response.user)
+            setUser(result.user)
         }catch(error){
 
             setError(error)
@@ -187,13 +178,9 @@ export default function useAuth(){
         console.log('Пересоздание кода')
         setIsLoading(true)
         try{
-            let response = await fetch(`${API_AUTH}/resend-verification`,{
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId : currentUser._id }),
-                credentials: 'include',
+            const response = await fetch(`${API_AUTH}/resend-verification`, {
+            method: 'POST',
+            credentials: 'include', // ← кука с токеном пришлётся
             });
 
             if(!response.ok){
@@ -211,7 +198,10 @@ export default function useAuth(){
     const logout = async ()=>{
         setIsLoading(true)
         try{
-            let response = await fetch(`${API_AUTH}/logout`);
+            const response = await fetch(`${API_AUTH}/logout`,{
+                method:'POST',
+                credentials: 'include',
+            });
 
             if(!response.ok){
                 throw new Error(response.message || 'Ошибка выхода из аккаунта')
@@ -236,8 +226,8 @@ export default function useAuth(){
 
         isLoading,
         error,
-        currentUser,
         emailAuthStatus,
+        user,
     }
     
 }

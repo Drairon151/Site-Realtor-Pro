@@ -6,7 +6,7 @@ export default function Authorization(){
 
     const {
         isLoading,
-        currentUser,
+        user,
     } = useAuth()
 
     return(
@@ -14,8 +14,8 @@ export default function Authorization(){
             {
                 isLoading ?(
                     <p>Загрузка...</p>
-                ): currentUser ? (
-                    <a href="/ProfilePage">{currentUser.userName}</a>
+                ): user ? (
+                    <a href="/ProfilePage">{user.userName}</a>
                 ):(
                     <>
 
