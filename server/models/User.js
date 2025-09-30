@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
   },
   isVerified: {
     type: Boolean,
-    default: false, // email не подтверждён
+    default: false,
   },
   verificationCode: {
     type: String,
@@ -36,9 +36,17 @@ const userSchema = new mongoose.Schema({
   verificationCodeExpires: {
     type: Date,
     default: null,
+  },
+  resendAttempts: {
+    type: Number,
+    default: 0,
+  },
+  lastVerificationSentAt: {
+    type: Date,
+    default: null,
   }
 }, {
-  timestamps: true, // createdAt, updatedAt
+  timestamps: true // createdAt, updatedAt
 });
 
 module.exports = mongoose.model('User', userSchema);

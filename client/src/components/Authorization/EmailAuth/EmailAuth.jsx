@@ -1,4 +1,7 @@
-export default function EmailAuth({verifyEmail, resendVerification, emailAuthStatus}){
+import useAuth from "../../../hooks/useAuth"
+
+export default function EmailAuth({cooldownTimer, verifyEmail, resendVerification, emailAuthStatus}){
+    
     return(
         <form className="form-auth" onSubmit={verifyEmail}>
 
@@ -21,7 +24,25 @@ export default function EmailAuth({verifyEmail, resendVerification, emailAuthSta
 
             <div>
                 <button type="submit" className="form-auth_button">Отправить</button>
-                <button type="button" onClick={resendVerification} className="form-auth_button">Прислать новый код</button>
+                
+                {
+                    cooldownTimer <= 0 ?(
+                        <button 
+                            type="button" 
+                            onClick={resendVerification} 
+                            className="form-auth_button"
+                        >
+                            Прислать новый код
+                        </button>
+                    ):(
+                        <div>
+                            Пожалуйста, подождите {cooldownTimer} секунд
+                        </div>
+                    )
+                }
+
+
+
 
             </div>
 

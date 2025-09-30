@@ -9,13 +9,13 @@ require('dotenv').config();
 
 const generateToken = (user) => {
   return jwt.sign(
-    { userId: user._id, mail: user.mail, role: user.role },
+    { _id: user._id, mail: user.mail, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: '7d' }
   );
 };
 
-// --- Контроллеры ---
+// --- РЕГИСТРАЦИЯ ---
 const register = async (req, res) => {
   console.log('\n🔧 === РЕГИСТРАЦИЯ ===');
   const { userName, mail, numberPhone, password, role = 'client' } = req.body;
@@ -49,6 +49,7 @@ const register = async (req, res) => {
       verificationCode,
       verificationCodeExpires: verificationExpires,
       isVerified: false,
+      resendAttempts: 0
     });
 
     await user.save();
@@ -77,7 +78,8 @@ const register = async (req, res) => {
 
     res.status(201).json({
       status: 'success',
-      message: 'Регистрация успешна. Подтвердите email.'
+      message: 'Регистрация успешна. Подтвердите email.',
+      _id: user._id
     });
   } catch (err) {
     console.error('💥 Ошибка:', err.message);
@@ -85,6 +87,7 @@ const register = async (req, res) => {
   }
 };
 
+// --- ВХОД ---
 const login = async (req, res) => {
   const { mail, password } = req.body;
   if (!mail || !password) {
@@ -129,14 +132,15 @@ const login = async (req, res) => {
   }
 };
 
+// --- ПОДТВЕРЖДЕНИЕ EMAIL ---
 const verifyEmail = async (req, res) => {
-  const { userId, code } = req.body;
-  if (!userId || !code) {
-    return res.status(400).json({ status: 'error', message: 'Требуются userId и код' });
+  const { _id, code } = req.body;
+  if (!_id || !code) {
+    return res.status(400).json({ status: 'error', message: 'Требуются _id и код' });
   }
 
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(_id);
     if (!user) {
       return res.status(404).json({ status: 'error', message: 'Пользователь не найден' });
     }
@@ -150,10 +154,10 @@ const verifyEmail = async (req, res) => {
     }
 
     if (Date.now() > user.verificationCodeExpires) {
-      await User.deleteOne({ _id: userId });
-      if (global.verificationTimers?.[userId]) {
-        clearTimeout(global.verificationTimers[userId]);
-        delete global.verificationTimers[userId];
+      await User.deleteOne({ _id: _id });
+      if (global.verificationTimers?.[_id]) {
+        clearTimeout(global.verificationTimers[_id]);
+        delete global.verificationTimers[_id];
       }
       return res.status(400).json({ status: 'error', message: 'Код истёк. Зарегистрируйтесь снова.' });
     }
@@ -161,6 +165,7 @@ const verifyEmail = async (req, res) => {
     user.isVerified = true;
     user.verificationCode = null;
     user.verificationCodeExpires = null;
+    user.resendAttempts = 0;
     await user.save();
 
     const token = generateToken(user);
@@ -180,14 +185,14 @@ const verifyEmail = async (req, res) => {
   }
 };
 
+// --- ПОВТОРНАЯ ОТПРАВКА КОДА ---
 const resendVerificationCode = async (req, res) => {
   console.log('\n🔄 === ПОВТОРНАЯ ОТПРАВКА КОДА ===');
 
   try {
-    // ✅ userId берём из токена, а не из тела
-    const { userId } = req.user; // ← установлен authMiddleware
+    const { _id } = req.body;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(_id);
     if (!user) {
       return res.status(404).json({
         status: 'error',
@@ -203,27 +208,35 @@ const resendVerificationCode = async (req, res) => {
     }
 
     const now = new Date();
-    const MINUTES_1 = 60 * 1000;
+    const attempts = user.resendAttempts || 0;
 
-    // 🔁 Проверка: прошло ли 60 секунд?
-    if (user.verificationCodeExpires && now < user.verificationCodeExpires) {
-      const remainingSeconds = Math.ceil((user.verificationCodeExpires - now) / 1000);
+    // Геометрический кулдаун: 30 × 2^attempts, максимум 180 сек
+    const baseDelay = 30;
+    const calculatedDelay = baseDelay * Math.pow(2, attempts);
+    const cooldownSeconds = Math.min(calculatedDelay, 180);
+
+    const lastSent = user.lastVerificationSentAt ? new Date(user.lastVerificationSentAt) : null;
+    if (lastSent && now - lastSent < cooldownSeconds * 1000) {
+      const remaining = Math.ceil((lastSent.getTime() + cooldownSeconds * 1000 - now) / 1000);
       return res.status(400).json({
         status: 'error',
-        message: `Подождите ${remainingSeconds} секунд`,
-        cooldown: remainingSeconds
+        cooldown: remaining,
+        message: `Подождите ${remaining} секунд`,
+        maxCooldownReached: cooldownSeconds >= 180
       });
     }
 
-    // 🔄 Генерируем новый код
+    // Генерируем новый код
     const verificationCode = crypto.randomInt(100000, 999999).toString();
     const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
 
     user.verificationCode = verificationCode;
     user.verificationCodeExpires = verificationCodeExpires;
+    user.lastVerificationSentAt = now;
+    user.resendAttempts = attempts + 1;
     await user.save();
 
-    // 📧 Отправляем письмо
+    // Отправляем письмо
     const emailSent = await sendVerificationEmail(user.mail, verificationCode);
     if (!emailSent) {
       return res.status(500).json({
@@ -235,10 +248,11 @@ const resendVerificationCode = async (req, res) => {
     console.log('✅ Новый код отправлен на', user.mail);
     res.json({
       status: 'success',
-      message: 'Код отправлен повторно'
+      message: 'Код отправлен повторно',
+      cooldown: cooldownSeconds
     });
   } catch (err) {
-    console.error('💥 Ошибка при повторной отправке:', err.message);
+    console.error('💥 Ошибка:', err.message);
     res.status(500).json({
       status: 'error',
       message: 'Ошибка сервера'
@@ -246,6 +260,7 @@ const resendVerificationCode = async (req, res) => {
   }
 };
 
+// --- ВЫХОД ---
 function logout(req, res) {
   res.clearCookie('token', {
     httpOnly: true,

@@ -15,17 +15,27 @@ export default function useAuth(){
     });
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState(false)
-
+    const [cooldownTimer, setCooldownTimer] = useState(0)
 
 
     const API_AUTH = 'http://localhost:5000/api/auth';
 
+    useEffect(() => {
+        if (cooldownTimer > 0) {
+        const timerId = setTimeout(() => {
+            console.log('timer ', cooldownTimer)
+            setCooldownTimer(cooldownTimer - 1);
+        }, 1000);
 
+        return () => clearTimeout(timerId); // Очистка при размонтировании или изменении
+        }
+    }, [cooldownTimer]); 
 
     useEffect(() => {
         const checkAuth = async () => {
         try {
             setIsLoading(true)
+            
             const response = await fetch('http://localhost:5000/api/me', {
                 method: 'GET',
                 credentials: 'include',
@@ -36,11 +46,11 @@ export default function useAuth(){
             }
 
             const result = await response.json();
-            console.log('Результат в проверка авторизации: ',result.user)
+
             setUser(result.user);
 
         } catch (err) {
-            setUser(null);
+            setError(true)
         }finally{
             setIsLoading(false)
         }
@@ -51,7 +61,7 @@ export default function useAuth(){
 
     const registration = async (event)=>{
         event.preventDefault()
-        setError(null);
+        setError(false);
         setIsLoading(true)
 
         const formData = new FormData(event.target);
@@ -77,9 +87,13 @@ export default function useAuth(){
                 const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.message || 'Ошибка регистрации');
             }
+
+            const result = await response.json();
+
+            setUser({...user, _id: result._id})
             setEmailAuthStatus({status:'wait-email-conf', type:'wait'})
             }catch(error){
-                setError(error.message)
+                setError(true)
 
             }finally{
                 setIsLoading(false)
@@ -109,7 +123,7 @@ export default function useAuth(){
                 }),
                 credentials: 'include',
             })
-            console.log('отладка шоколадка')
+
 
             if(!response.ok){
                 throw new Error(response.message || 'Ошибка входа в аккаунт');
@@ -119,10 +133,11 @@ export default function useAuth(){
 
             window.location.href = '/';
             
-            setUser(result.user)
+
+            setUser({...user, ...result.user})
         }catch(error){
 
-            setError(error)
+            setError(true)
 
         }finally{
             setIsLoading(false)
@@ -131,13 +146,12 @@ export default function useAuth(){
 
     const verifyEmail = async(event)=>{
         event.preventDefault()
-        setError(null);
+        setError(false);
         setIsLoading(true)
 
         const formData = new FormData(event.target);
-        console.log('Айди пользователя ',currentUser._id )
         const userData = {
-            userId: currentUser._id,
+            _id: user._id,
             code: formData.get('emailCode'),
         };
 
@@ -166,7 +180,7 @@ export default function useAuth(){
             setEmailAuthStatus({status:'success', type: 'verified'})
             window.location.href = '/';
         }catch(error){            
-            setError(error);
+            setError(true);
 
         }finally{
             setIsLoading(false)
@@ -175,20 +189,29 @@ export default function useAuth(){
     }
 
     const resendVerification = async ()=>{
-        console.log('Пересоздание кода')
+
         setIsLoading(true)
         try{
+
             const response = await fetch(`${API_AUTH}/resend-verification`, {
-            method: 'POST',
-            credentials: 'include', // ← кука с токеном пришлётся
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({_id: user._id}),
+                credentials: 'include',
             });
 
             if(!response.ok){
-                throw new Error(response.message || 'Ошибка выхода из аккаунта')
+                throw new Error(response.message || 'Ошибка переотправки кода')
             }
 
+            const result = await response.json()
+            console.log(result.cooldown)
+            setCooldownTimer(result.cooldown);
+
         }catch(error){
-            setError(error)
+            setError(true)
         }finally{
             setIsLoading(true)
         }
@@ -210,9 +233,9 @@ export default function useAuth(){
             window.location.href = '/';
 
         }catch(error){
-            setError(error)
+            setError(true)
         }finally{
-            setIsLoading(true)
+            setIsLoading(false)
         }
 
     }
@@ -223,7 +246,8 @@ export default function useAuth(){
         verifyEmail,
         resendVerification,
         logout,
-
+        
+        cooldownTimer,
         isLoading,
         error,
         emailAuthStatus,

@@ -8,6 +8,7 @@ export default function RegistrationPage(){
         verifyEmail,
         resendVerification,
 
+        cooldownTimer,
         emailAuthStatus,
     } = useAuth()
 
@@ -21,6 +22,7 @@ export default function RegistrationPage(){
                 />
             ): emailAuthStatus.status === 'wait-email-conf' ?(
                 <EmailAuth
+                    cooldownTimer={cooldownTimer}
                     verifyEmail={verifyEmail}
                     resendVerification={resendVerification}
                     emailAuthStatus={emailAuthStatus}
