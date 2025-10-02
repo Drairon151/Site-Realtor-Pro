@@ -14,7 +14,7 @@ export default function RegistrationPage(){
 
 
     return(
-        <section className="registration-section">
+        <div className="registration-page auth-pages">
 
             {emailAuthStatus.status === 'not-sent' ?(
                 <Registration
@@ -31,6 +31,6 @@ export default function RegistrationPage(){
             ): (null)}
             
 
-        </section>
+        </div>
     )
 }

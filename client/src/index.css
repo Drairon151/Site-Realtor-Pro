@@ -12,12 +12,16 @@
 
 *{
   padding: 0;
-  margin: 0 auto;
+  margin: 0;
   text-decoration: none;
   list-style: none;
   color: black;
 
   font-family: 'Comfortaa';
+}
+
+main {
+  min-height: 100vh;
 }
 
 .flex{
@@ -30,8 +34,6 @@
 }
 
 dialog {
-  /* padding: 0;
-  margin: 0; */
   border: none;
   background: transparent;
   font: inherit;
@@ -44,14 +46,15 @@ button{
 }
 
 .button{
-    min-height: 70px;
-    min-width: 100px;
+  min-height: 70px;
+  min-width: 100px;
 
-    margin: 5px;
+  margin: 5px;
 
-    padding-left: 5px;
-    padding-right: 5px;
-    background-color: #7fffd4;
-    border: 5px solid #58d4ab;
-    border-radius: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #7fffd4;
+  border: 5px solid #58d4ab;
+  border-radius: 5px;
 }
+

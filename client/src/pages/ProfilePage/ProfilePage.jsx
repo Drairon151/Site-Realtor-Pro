@@ -1,14 +1,14 @@
-import useAuth from "../../hooks/useAuth"
+import ProfileSection from "./ProfileSection/ProfileSection"
+
+import './ProfilePage.css'
 
 export default function ProfilePage(){
-    const {
-        logout,
-    } = useAuth()
     
     return(
-        <>
-        <p>Привет</p>
-        <button onClick={logout}>Выйти из аккаунта</button>
-        </>
+        <div className="profile-page">
+
+            <ProfileSection/>
+
+        </div>
     )
 }

@@ -1,0 +1,22 @@
+.profile-user-card{
+    background-color: black;
+    width: 600px;
+    padding: 20px;
+    border-radius: 25px;
+}
+
+.user-basic-info_avatar{
+    max-width: 100px;
+}
+
+.user-basic-info_name{
+    color: white;
+}
+
+.user-contact-info{
+    padding-left: 10px;
+}
+
+.user-contact-info_item--lable{
+    color: white;
+}

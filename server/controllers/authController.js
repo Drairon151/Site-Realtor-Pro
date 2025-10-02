@@ -18,12 +18,18 @@ const generateToken = (user) => {
 // --- РЕГИСТРАЦИЯ ---
 const register = async (req, res) => {
   console.log('\n🔧 === РЕГИСТРАЦИЯ ===');
-  const { userName, mail, numberPhone, password, role = 'client' } = req.body;
+  const { 
+    fullName, 
+    mail, 
+    numberPhone, 
+    password, 
+    role = 'client' 
+  } = req.body;
 
-  if (!userName || !mail || !password) {
+  if (!fullName.name || !fullName.surname || !mail || !password) {
     return res.status(400).json({
       status: 'error',
-      message: 'Имя, email и пароль обязательны'
+      message: 'Имя, фамилия, email и пароль обязательны'
     });
   }
 
@@ -36,19 +42,31 @@ const register = async (req, res) => {
       });
     }
 
+    // Проверка роли
+    if (!['client', 'realtor'].includes(role)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Недопустимая роль'
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const verificationCode = crypto.randomInt(100000, 999999).toString();
     const verificationExpires = new Date(Date.now() + 10 * 60 * 1000);
 
     const user = new User({
-      userName,
+      fullName: {
+        name: fullName.name,
+        surname: fullName.surname,
+        patronymic: fullName.patronymic,
+      },
       mail,
       numberPhone,
       password: hashedPassword,
       role,
+      isVerified: false,
       verificationCode,
       verificationCodeExpires: verificationExpires,
-      isVerified: false,
       resendAttempts: 0
     });
 
@@ -121,7 +139,7 @@ const login = async (req, res) => {
       status: 'success',
       user: {
         _id: user._id,
-        userName: user.userName,
+        fullName: user.fullName,
         mail: user.mail,
         role: user.role,
         numberPhone: user.numberPhone

@@ -7,6 +7,7 @@ import HeaderMenuLi from "../headerMenuLi"
 import Authorization from '../Authorization/Authorization'
 
 export default function Header(){
+    
     return(
         <header className="header flex">
 

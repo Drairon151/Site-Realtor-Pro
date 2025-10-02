@@ -2,9 +2,10 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  userName: {
-    type: String,
-    required: true,
+  fullName: {
+    name: { type: String, required: true },
+    surname: { type: String, required: true },
+    patronymic: { type: String, default: null },
   },
   mail: {
     type: String,
@@ -29,6 +30,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isDiplomaVerified: {
+    type: Boolean,
+    default: false,
+  },
   verificationCode: {
     type: String,
     default: null,
@@ -46,7 +51,7 @@ const userSchema = new mongoose.Schema({
     default: null,
   }
 }, {
-  timestamps: true // createdAt, updatedAt
+  timestamps: true
 });
 
 module.exports = mongoose.model('User', userSchema);

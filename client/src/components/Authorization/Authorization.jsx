@@ -2,6 +2,7 @@ import './Authorization.css'
 
 import useAuth from "../../hooks/useAuth";
 
+
 export default function Authorization(){
 
     const {
@@ -10,18 +11,20 @@ export default function Authorization(){
         error,
     } = useAuth()
 
+    console.log(user)
+
     return(
-        <div className="flex center">
+        <div className="nav flex center">
             {
                 isLoading ?(
                     <p>Загрузка...</p>
                 ): !error ? (
-                    <a href="/ProfilePage">{user.userName}</a>
+                    <a className="nav-button nav-button_profile" href="/ProfilePage">{user.fullName.name}</a>
                 ):(
                     <>
 
-                        <a href="/RegistrationPage">Регистрация</a>
-                        <a href="/LoginPage">Уже есть аккаунт</a>
+                        <a className="nav-button nav-button_registration" href="/RegistrationPage">Регистрация</a>
+                        <a className="nav-button nav-button_login" href="/LoginPage">Вход</a>
                         
                     </>
                 )

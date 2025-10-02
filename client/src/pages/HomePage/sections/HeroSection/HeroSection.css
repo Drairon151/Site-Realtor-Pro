@@ -1,5 +1,5 @@
 .hero{
-    height: 500px;
+    height: 600px;
     width: 100%;
     background: 
         linear-gradient(rgba(0, 0, 0, 0.719), rgba(0, 0, 0, 0.322)),
@@ -10,7 +10,7 @@
 }
 
 .hero_text{
-    padding-top: 60px;
+    padding-top: 160px;
     padding-left: 60px;
 }
 
@@ -26,5 +26,6 @@
 }
 
 .hero_img{
+    padding-top:100px;
     max-width: 500px;
 }

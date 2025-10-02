@@ -5,9 +5,14 @@ export default function useAuth(){
     const [user, setUser] = useState({
         _id : null,
         role: null,
-        userName: null,
+        fullName: {
+            name: null,
+            surname: null,
+            patronymic: null,
+        },
         mail: null,
         numberPhone: null,
+        isDiplomaVerified: false,
     })
     const [emailAuthStatus, setEmailAuthStatus] = useState({
         status:'not-sent',
@@ -35,20 +40,26 @@ export default function useAuth(){
         const checkAuth = async () => {
         try {
             setIsLoading(true)
+            const userData = JSON.parse(localStorage.getItem('userData'))
             
-            const response = await fetch('http://localhost:5000/api/me', {
-                method: 'GET',
-                credentials: 'include',
-            });
+            if(userData){
+                setUser(userData)
+            }else{
 
-            if (!response.ok) {
-                throw new Error(response.message || 'Ошибка проверки авторизации')
+                const response = await fetch('http://localhost:5000/api/me', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                if (!response.ok) {
+                    throw new Error(response.message || 'Ошибка проверки авторизации')
+                }
+
+                const result = await response.json();
+
+                localStorage.setItem('userData',JSON.stringify(result.user))
+                setUser(result.user);
             }
-
-            const result = await response.json();
-
-            setUser(result.user);
-
         } catch (err) {
             setError(true)
         }finally{
@@ -67,11 +78,19 @@ export default function useAuth(){
         const formData = new FormData(event.target);
 
         const userData = {
-            userName: formData.get('userName'),
+            fullName: {
+                surname: formData.get('surname'),
+                name: formData.get('name'),
+                patronymic: formData.get('patronymic'),
+
+            },
             mail: formData.get('mail'),
             numberPhone: formData.get('numberPhone'),
             password: formData.get('password'),
+            role: formData.get('role'),
         };
+
+        console.log('Данные пользователя: ', userData)
 
         try{
             const response = await fetch(`${API_AUTH}/register`,{
@@ -89,8 +108,8 @@ export default function useAuth(){
             }
 
             const result = await response.json();
-
-            setUser({...user, _id: result._id})
+            
+            setUser({...userData, _id: result._id})
             setEmailAuthStatus({status:'wait-email-conf', type:'wait'})
             }catch(error){
                 setError(true)
@@ -133,8 +152,8 @@ export default function useAuth(){
 
             window.location.href = '/';
             
-
-            setUser({...user, ...result.user})
+            localStorage.setItem('userData',JSON.stringify({...user, ...result.user}))
+            setUser({...userData, ...result.user})
         }catch(error){
 
             setError(true)
@@ -178,6 +197,7 @@ export default function useAuth(){
             }
 
             setEmailAuthStatus({status:'success', type: 'verified'})
+            localStorage.setItem('userData',JSON.stringify(user))
             window.location.href = '/';
         }catch(error){            
             setError(true);
@@ -230,8 +250,8 @@ export default function useAuth(){
                 throw new Error(response.message || 'Ошибка выхода из аккаунта')
             }
 
+            localStorage.removeItem('userData')
             window.location.href = '/';
-
         }catch(error){
             setError(true)
         }finally{

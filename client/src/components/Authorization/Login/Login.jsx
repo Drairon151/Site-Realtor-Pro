@@ -1,7 +1,6 @@
 export default function Login({login, onClose}){
     return(
-        <>
-            <form className="form-auth" onSubmit={login}>
+            <form className="form-auth center" onSubmit={login}>
                 <label className="form-auth_lable">Email:</label>
                 <input name="mail" className="form-auth_input" type="email"></input>
 
@@ -13,6 +12,5 @@ export default function Login({login, onClose}){
                 <button onClick={onClose} className="form-auth_button">✖️</button>
 
             </form>
-        </>
     )
 }

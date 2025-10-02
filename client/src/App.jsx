@@ -9,6 +9,7 @@ import LoginPage from './pages/AuthorizationPages/LoginPage/LoginPage';
 
 function App() {
 
+
   return (
     <BrowserRouter>
       <Header/>
