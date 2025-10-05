@@ -1,8 +1,13 @@
 .profile-user-card{
+    margin: 0 auto;
     background-color: black;
-    width: 600px;
+    max-width: 800px;
     padding: 20px;
     border-radius: 25px;
+}
+
+.user-card_user-info{
+    width: 100;
 }
 
 .user-basic-info_avatar{
@@ -17,6 +22,32 @@
     padding-left: 10px;
 }
 
+.user-contact-info_item{
+    padding: 10px;
+}
+
 .user-contact-info_item--lable{
     color: white;
+}
+
+.user-contact-info_item--input{
+
+    background: none;
+    border: none;
+    color: white;
+    margin-left: 10px;
+}
+
+.user-card_button{
+    padding: 5px;
+    margin: 5px;
+    background: white;
+    border-radius: 10px;
+}
+
+.user-card_buttons{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
 }

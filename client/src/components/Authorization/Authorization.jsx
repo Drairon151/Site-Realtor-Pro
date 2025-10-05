@@ -1,4 +1,5 @@
 import './Authorization.css'
+import '../../styles/forms.css'
 
 import useAuth from "../../hooks/useAuth";
 

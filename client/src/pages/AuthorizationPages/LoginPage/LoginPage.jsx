@@ -9,11 +9,15 @@ export default function LoginPage(){
     return(
         <div className="login-page auth-pages">
 
-            <Login
-                login={login}
-                onClose={()=>console.log('plug')}
-            />
-        
+            <div className="auth-pages_container">
+
+                <Login
+                    login={login}
+                    onClose={()=>console.log('plug')}
+                />
+
+            </div>
+
         </div>
     )
 }

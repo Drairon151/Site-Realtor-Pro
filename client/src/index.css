@@ -21,7 +21,7 @@
 }
 
 main {
-  min-height: 100vh;
+  min-height: calc(100vh - 100px);;
 }
 
 .flex{
@@ -44,17 +44,3 @@ button{
   background: none;
   border: none;
 }
-
-.button{
-  min-height: 70px;
-  min-width: 100px;
-
-  margin: 5px;
-
-  padding-left: 5px;
-  padding-right: 5px;
-  background-color: #7fffd4;
-  border: 5px solid #58d4ab;
-  border-radius: 5px;
-}
-

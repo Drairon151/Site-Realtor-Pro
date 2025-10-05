@@ -1,0 +1,47 @@
+.form{
+    max-width: 500px;
+    min-width: 300px;
+
+    padding: 20px;
+
+    margin: 0 auto;
+
+    background-color: white;
+    border: 4px solid #000;
+    border-radius: 12px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    box-sizing: border-box;
+}
+
+.form_lable{
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form_input{
+    border-radius: 50px;
+    padding: 5px;
+}
+
+.form_button{
+    border-radius: 50px;
+    padding: 10px;
+
+    border: solid black 3px;
+
+    transition: 1s;
+
+    background-color: black;
+    color: white;
+}
+
+.form_button:hover{
+    transition: 1s;
+
+    background-color: white;
+    color: black;
+}

@@ -1,38 +1,38 @@
-import useAuth from "../../../hooks/useAuth"
+import './EmailAuth.css'
 
 export default function EmailAuth({cooldownTimer, verifyEmail, resendVerification, emailAuthStatus}){
     
     return(
-        <form className="form-auth" onSubmit={verifyEmail}>
+        <form className="form emal-auth-form" onSubmit={verifyEmail}>
 
-            <h1>Пожалуйста проверьте почту</h1>
+            <h1>Подтвердите действие, проверьте почту</h1>
 
-            <label className="form-auth_lable">Код подтверждения:</label>
-            <input name="emailCode" className="form-auth_input" type="number"></input>
+            <label className="form_lable">Код подтверждения:</label>
+            <input name="emailCode" className="form_input" type="number"></input>
 
             {
-                emailAuthStatus.type === 'wait'? (
+                emailAuthStatus.type === 'wait' || emailAuthStatus.type === null ?(
                     null
                 ): emailAuthStatus.type === 'invalid_code' ?(
                     <p>Неверный код</p>
                 ): emailAuthStatus.type === 'code_expired' ?(
-                    <p>Неверный код</p>
+                    <p>Код просрочен</p>
                 ):(
                     <p>Что то пошло не так, попробуйте отправит заново</p>
                 )
             }
 
-            <div>
-                <button type="submit" className="form-auth_button">Отправить</button>
+            <div className='emal-auth-form_buttons'>
+                <button type="submit" className="form_button emal-auth-form_button">Отправить</button>
                 
                 {
                     cooldownTimer <= 0 ?(
                         <button 
                             type="button" 
                             onClick={resendVerification} 
-                            className="form-auth_button"
+                            className="form_button emal-auth-form_button"
                         >
-                            Прислать новый код
+                            Прислать код
                         </button>
                     ):(
                         <div>

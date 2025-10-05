@@ -16,20 +16,23 @@ export default function RegistrationPage(){
     return(
         <div className="registration-page auth-pages">
 
-            {emailAuthStatus.status === 'not-sent' ?(
-                <Registration
-                    registration={registration}
-                />
-            ): emailAuthStatus.status === 'wait-email-conf' ?(
-                <EmailAuth
-                    cooldownTimer={cooldownTimer}
-                    verifyEmail={verifyEmail}
-                    resendVerification={resendVerification}
-                    emailAuthStatus={emailAuthStatus}
-                />
-                
-            ): (null)}
-            
+            <div className="auth-pages_container">
+
+                {emailAuthStatus.status === 'not-sent' ?(
+                    <Registration
+                        registration={registration}
+                    />
+                ): emailAuthStatus.status === 'wait-email-conf' ?(
+                    <EmailAuth
+                        cooldownTimer={cooldownTimer}
+                        verifyEmail={verifyEmail}
+                        resendVerification={resendVerification}
+                        emailAuthStatus={emailAuthStatus}
+                    />
+                    
+                ): (null)}
+
+            </div>
 
         </div>
     )

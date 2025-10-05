@@ -7,11 +7,16 @@ export default function Profile(){
     const {
         user,
         logout,
+        changePassword,
     } = useAuth()
     
     return(
         <section className="profile-section">
-            <ProfileUserCard user={user} logout={logout}/>
+
+            <div className="profile-section_container">
+                <ProfileUserCard user={user} logout={logout} changePassword={changePassword}/>
+            </div>
+
         </section>
     )
 }
