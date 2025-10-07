@@ -8,7 +8,9 @@ router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select(`
       _id 
-      fullName 
+      name
+      surname
+      patronymic
       mail 
       role 
       numberPhone 
@@ -16,7 +18,7 @@ router.get('/me', authMiddleware, async (req, res) => {
     `);
 
     if (!user) {
-      return res.status(404).json({ message: 'Пользователь не найден' });
+      return res.status(403).json({ message: 'Пользователь не найден' });
     }
 
     res.json({ user });

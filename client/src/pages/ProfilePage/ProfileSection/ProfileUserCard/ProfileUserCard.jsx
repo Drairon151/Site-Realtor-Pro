@@ -2,16 +2,26 @@ import './ProfileUserCard.css'
 import plug from '../../../../assets/img/icons/plug.png'
 import Modal from '../../../../components/Modal/Modal'
 import ChangePasswordForm from '../ProfileComponents/ChangePasswordForm/ChangePasswordForm'
-import { useState } from 'react'
-import useAuth from '../../../../hooks/useAuth'
+import { useEffect, useState } from 'react'
 
-export default function ProfileUserCard({user, logout, changePassword}){
+export default function ProfileUserCard({user, logout, sendVerifyCodeChangePassword}){
     const [isOpen, setIsOpen] = useState(false);
 
-    const {
-        sendVerifyCodeChangePassword
-    }= useAuth()
-    
+    const [editUser, setEditUser] = useState(user)
+
+    function editUserChangeOnClick(event){
+        const {name, value} = event.target;
+        setEditUser(prev=>{
+            const update = {...prev}
+            update[name] = value
+            return update
+        },[])
+    }
+
+    function editUserSaveOnBlur(event){
+        console.log('Разблюр')
+    }
+
     return(
         <div className='profile-user-card user-card'>
 
@@ -19,7 +29,7 @@ export default function ProfileUserCard({user, logout, changePassword}){
 
                 <div className='user-basic-info'>
                     <img className='user-basic-info_avatar' src={plug}/>
-                    <h1 className='user-basic-info_name'>{user.fullName.name}</h1>
+                    <h1 className='user-basic-info_name'>{user.name}</h1>
                 </div>
 
                 <div className='user-contact-info'>
@@ -31,7 +41,9 @@ export default function ProfileUserCard({user, logout, changePassword}){
                             className='user-contact-info_item--input' 
                             name='surname' 
                             type='text' 
-                            value={user.fullName.surname}
+                            value={editUser.surname}
+                            onChange={editUserChangeOnClick}
+                            onBlur={editUserSaveOnBlur}
                         ></input>
                     </div>
                     <div className='user-contact-info_item'>
@@ -42,7 +54,9 @@ export default function ProfileUserCard({user, logout, changePassword}){
                             className='user-contact-info_item--input' 
                             name='name' 
                             type='text' 
-                            value={user.fullName.name}
+                            value={editUser.name}
+                            onChange={editUserChangeOnClick}
+                            onBlur={editUserSaveOnBlur}
                         ></input>
                     </div>
                     <div className='user-contact-info_item'>
@@ -53,7 +67,9 @@ export default function ProfileUserCard({user, logout, changePassword}){
                             className='user-contact-info_item--input' 
                             name='patronymic' 
                             type='text' 
-                            value={user.fullName.patronymic}
+                            value={editUser.patronymic}
+                            onChange={editUserChangeOnClick}
+                            onBlur={editUserSaveOnBlur}
                         ></input>
                     </div>
                     <div className='user-contact-info_item'>
@@ -64,7 +80,9 @@ export default function ProfileUserCard({user, logout, changePassword}){
                             className='user-contact-info_item--input' 
                             name='mail' 
                             type='text' 
-                            value={user.mail}
+                            value={editUser.mail}
+                            onChange={editUserChangeOnClick}
+                            onBlur={editUserSaveOnBlur}
                         ></input>
                     </div>
                     <div className='user-contact-info_item'>
@@ -75,7 +93,9 @@ export default function ProfileUserCard({user, logout, changePassword}){
                             className='user-contact-info_item--input' 
                             name='numberPhone' 
                             type='text' 
-                            value={user.numberPhone}
+                            value={editUser.numberPhone}
+                            onChange={editUserChangeOnClick}
+                            onBlur={editUserSaveOnBlur}
                         ></input>
                     </div>
                     <div className='user-contact-info_item'>
@@ -86,7 +106,9 @@ export default function ProfileUserCard({user, logout, changePassword}){
                             className='user-contact-info_item--input' 
                             name='role' 
                             type='text' 
-                            value={user.role}
+                            value={editUser.role}
+                            onChange={editUserChangeOnClick}
+                            onBlur={editUserSaveOnBlur}
                         ></input>
                     </div>
                 </div>

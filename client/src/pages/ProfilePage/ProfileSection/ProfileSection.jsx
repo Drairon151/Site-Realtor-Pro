@@ -7,14 +7,14 @@ export default function Profile(){
     const {
         user,
         logout,
-        changePassword,
+        sendVerifyCodeChangePassword,
     } = useAuth()
     
     return(
         <section className="profile-section">
 
             <div className="profile-section_container">
-                <ProfileUserCard user={user} logout={logout} changePassword={changePassword}/>
+                <ProfileUserCard user={user} logout={logout} sendVerifyCodeChangePassword={sendVerifyCodeChangePassword}/>
             </div>
 
         </section>

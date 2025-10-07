@@ -3,13 +3,13 @@ import { useState, useEffect } from "react";
 export default function useAuth(){
 
     const [user, setUser] = useState({
+        name: null,
+        surname: null,
+        patronymic: null,
+
         _id : null,
         role: null,
-        fullName: {
-            name: null,
-            surname: null,
-            patronymic: null,
-        },
+
         mail: null,
         numberPhone: null,
         isDiplomaVerified: false,
@@ -20,6 +20,7 @@ export default function useAuth(){
     });
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState(false)
+    const [userAuthorized, setUserAuthorized] = useState(false)
     const [cooldownTimer, setCooldownTimer] = useState(0)
 
 
@@ -35,15 +36,11 @@ export default function useAuth(){
         }
     }, [cooldownTimer]); 
 
-    useEffect(() => {
+
+    useEffect(()=>{
         const checkAuth = async () => {
-        try {
-            setIsLoading(true)
-            const userData = JSON.parse(localStorage.getItem('userData'))
-            
-            if(userData){
-                setUser(userData)
-            }else{
+            console.log('Проверка авторизации')
+            try {
 
                 const response = await fetch('http://localhost:5000/api/me', {
                     method: 'GET',
@@ -55,19 +52,21 @@ export default function useAuth(){
                 }
 
                 const result = await response.json();
-
+                setUserAuthorized(true)
                 localStorage.setItem('userData',JSON.stringify(result.user))
                 setUser(result.user);
+
+            } catch (err) {
+                setUserAuthorized(false)
+                setError(true)
+            }finally{
+                setIsLoading(false)
             }
-        } catch (err) {
-            setError(true)
-        }finally{
-            setIsLoading(false)
-        }
         };
 
-        checkAuth();
-    }, []);
+        checkAuth()
+    
+    },[])
 
     const registration = async (event)=>{
         event.preventDefault()
@@ -77,12 +76,11 @@ export default function useAuth(){
         const formData = new FormData(event.target);
 
         const userData = {
-            fullName: {
-                surname: formData.get('surname'),
-                name: formData.get('name'),
-                patronymic: formData.get('patronymic'),
 
-            },
+            surname: formData.get('surname'),
+            name: formData.get('name'),
+            patronymic: formData.get('patronymic'),
+
             mail: formData.get('mail'),
             numberPhone: formData.get('numberPhone'),
             password: formData.get('password'),
@@ -152,6 +150,7 @@ export default function useAuth(){
             window.location.href = '/';
             
             localStorage.setItem('userData',JSON.stringify({...user, ...result.user}))
+            setUserAuthorized(true)
             setUser({...userData, ...result.user})
         }catch(error){
 
@@ -182,20 +181,20 @@ export default function useAuth(){
                 body: JSON.stringify(userData),
                 credentials: 'include',
             })
+            const result = await response.json()
+
 
             if(!response.ok){
-                const errorType = await response.json().type;
                 
-                if(errorType==='code-expired'){
-                    setEmailAuthStatus({status:'error', type: 'code-expired'})
-                }else if(errorType==='invalid_code'){
-                    setEmailAuthStatus({status:'error', type: 'invalid_code'})
-                }
+                console.log('ААА ШИБКА', result)
+
+                setEmailAuthStatus({...emailAuthStatus, type: result.type})
+
 
                 throw new Error(response.message || 'Ошибка отправки кода подтверждения на сервер')
             }
-
-            setEmailAuthStatus({status:'success', type: 'verified'})
+            
+            setEmailAuthStatus({status:null, type:null,})
             localStorage.setItem('userData',JSON.stringify(user))
 
             window.location.href = '/';
@@ -210,27 +209,6 @@ export default function useAuth(){
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
 
     const resendVerification = async ()=>{
 
@@ -275,6 +253,23 @@ export default function useAuth(){
             }
 
             localStorage.removeItem('userData')
+            setUser({
+                name: null,
+                surname: null,
+                patronymic: null,
+
+                _id : null,
+                role: null,
+
+                mail: null,
+                numberPhone: null,
+                isDiplomaVerified: false,
+            })
+            setEmailAuthStatus({
+                status:null,
+                type:null,
+            })
+            setUserAuthorized(false)
             window.location.href = '/';
         }catch(error){
             setError(true)
@@ -444,6 +439,7 @@ export default function useAuth(){
         error,
         emailAuthStatus,
         user,
+        userAuthorized,
     }
     
 }

@@ -18,7 +18,7 @@ export default function RegistrationPage(){
 
             <div className="auth-pages_container">
 
-                {emailAuthStatus.status === 'not-sent' ?(
+                {emailAuthStatus.status === null ?(
                     <Registration
                         registration={registration}
                     />
@@ -30,7 +30,9 @@ export default function RegistrationPage(){
                         emailAuthStatus={emailAuthStatus}
                     />
                     
-                ): (null)}
+                ): (
+                    <p>ОШИБКА</p>
+                )}
 
             </div>
 

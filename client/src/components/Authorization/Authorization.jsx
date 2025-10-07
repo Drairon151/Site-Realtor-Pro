@@ -9,18 +9,16 @@ export default function Authorization(){
     const {
         isLoading,
         user,
-        error,
+        userAuthorized,
     } = useAuth()
-
-    console.log(user)
 
     return(
         <div className="nav flex center">
             {
                 isLoading ?(
                     <p>Загрузка...</p>
-                ): !error ? (
-                    <a className="nav-button nav-button_profile" href="/ProfilePage">{user.fullName.name}</a>
+                ): userAuthorized ? (
+                    <a className="nav-button nav-button_profile" href="/ProfilePage">{user.name}</a>
                 ):(
                     <>
 

@@ -21,7 +21,7 @@ export default function ChangePasswordForm({onClose}){
         <>
         
         {
-            emailAuthStatus.status === 'code-not-success' || emailAuthStatus.status === null ?(
+            emailAuthStatus.status === null ?(
                 <EmailAuth
                     cooldownTimer={cooldownTimer}
                     verifyEmail={verifyCodeChangePassword}
