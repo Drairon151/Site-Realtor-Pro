@@ -1,4 +1,6 @@
+const express = require('express');
 const User = require('../models/User');
+const router = express.Router();
 
 // --- СМЕНА ПАРОЛЯ ---
 const changePassword = async (req, res) => {
@@ -256,20 +258,88 @@ const resendPasswordResetCode = async (req, res) => {
   }
 };
 
-const updateUserData = async (req, res) => {
-    const {_id, updatedField, updatedValue } = req.body;
+const updateUserField = async (req, res) => {
+  console.log('Начало изменений данных пользователя')
+  try{
+    const {updatedField, updatedValue } = req.body;
 
-    const user = await User.findById(_id);
-    if(!user){
-        res.status(400).json({
+    const userId = req.user._id;
+
+    const allowedUpdates = ['name', 'surname', 'patronymic', 'mail', 'numberPhone', 'role'];
+
+    if(!userId){
+        return res.status(400).json({
             status:'error',
             message: 'Пользователь с таким айди не найден'
         })
     }
-}
+
+    if (!allowedUpdates.includes(updatedField)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Обновление этого поля запрещено'
+      });
+    }
+    const update = {[updatedField]:updatedValue}
+    console.log('Новые данные ', update)
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      update,
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if(!user){
+      return res.status(400).json({
+        status: 'error',
+        message: 'Пользователь не найден'
+      })
+    }
+
+      console.log('Изменения сохранены')
+      res.json({
+        status: 'success',
+        updatedField,
+        updatedValue: user[updatedField]
+      }
+    
+    );
+
+  } catch (error) {
+      // 🚫 Ошибка уникальности (например, email уже занят)
+      if (error.code === 11000) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Этот email уже используется другим аккаунтом'
+        });
+      }
+
+      // 🚫 Ошибки валидации Mongoose (required, формат и т.д.)
+      if (error.name === 'ValidationError') {
+        const messages = Object.values(error.errors).map(e => e.message);
+        return res.status(400).json({
+          status: 'error',
+          message: messages.join('; ')
+        });
+      }
+
+      console.error('💥 Ошибка обновления профиля:', error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Внутренняя ошибка сервера'
+      });
+    }
+
+};
+
 
 module.exports = {
     sendPasswordResetCode,
     changePassword,
     resendPasswordResetCode,
+
+    updateUserField,
 }

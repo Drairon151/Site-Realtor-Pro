@@ -1,16 +1,21 @@
 import './Authorization.css'
 import '../../styles/forms.css'
-
+import { useNavigate } from 'react-router-dom';
 import useAuth from "../../hooks/useAuth";
+import useUser from '../../hooks/useUser';
 
 
 export default function Authorization(){
+  const navigate = useNavigate();
 
     const {
         isLoading,
+    } = useAuth()
+
+    const {
         user,
         userAuthorized,
-    } = useAuth()
+    } = useUser()
 
     return(
         <div className="nav flex center">
@@ -18,12 +23,26 @@ export default function Authorization(){
                 isLoading ?(
                     <p>Загрузка...</p>
                 ): userAuthorized ? (
-                    <a className="nav-button nav-button_profile" href="/ProfilePage">{user.name}</a>
+                    <button 
+                        className="nav-button nav-button_profile"
+                        onClick={() => navigate('/ProfilePage')}
+                    >{user.name}</button>
                 ):(
                     <>
 
-                        <a className="nav-button nav-button_registration" href="/RegistrationPage">Регистрация</a>
-                        <a className="nav-button nav-button_login" href="/LoginPage">Вход</a>
+                        <button 
+                            className="nav-button nav-button_registration"
+                            onClick={() => navigate('/RegistrationPage')}
+                        >
+                            Регистрация
+                        </button>
+
+                        <button 
+                            className="nav-button nav-button_login"
+                            onClick={() => navigate('/LoginPage')}
+                        >
+                            Вход
+                        </button>
                         
                     </>
                 )

@@ -7,6 +7,9 @@ import ProfilePage from './pages/ProfilePage/ProfilePage'
 import RegistrationPage from './pages/AuthorizationPages/RegistrationPage/RegistrationPage';
 import LoginPage from './pages/AuthorizationPages/LoginPage/LoginPage';
 
+import PublicLayout from './layouts/PublicLayout';
+import AppLayout from './layouts/AppLayout';
+
 function App() {
 
   return (
@@ -14,13 +17,18 @@ function App() {
       <Header/>
         <main>
           
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/RegistrationPage" element={<RegistrationPage/>} />
-            <Route path="/LoginPage" element={<LoginPage/>} />
-            <Route path="/ProfilePage" element={<ProfilePage/>} />
-            
-          </Routes>
+      <Routes>
+
+        <Route element={<PublicLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path="/RegistrationPage" element={<RegistrationPage />} />
+          <Route path="/LoginPage" element={<LoginPage />} />
+        </Route>
+
+        <Route element={<AppLayout />}>
+          <Route path="/ProfilePage" element={<ProfilePage />} />
+        </Route>
+      </Routes>
 
         </main> 
       <Footer/>

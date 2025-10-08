@@ -51,3 +51,8 @@
     align-items: center;
     gap: 15px;
 }
+
+.user-contact-info_item--input-radio{
+    margin-left: 10px;
+    margin-right: 10px;
+}

@@ -5,6 +5,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser'); // ← добавь
 require('dotenv').config();
 
+const authMiddleware = require('./middleware/authMiddleware');
 const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes'); // ✅ Здесь!
 const userRoutes = require('./routes/userRoutes')
@@ -21,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser()); // ← парсинг кук
 
 app.use('/api/auth', authRoutes);
-app.use('/api/user',userRoutes)
+app.use('/api/user', authMiddleware, userRoutes);
 app.use('/api', profileRoutes);
 
 app.get('/', (req, res) => {

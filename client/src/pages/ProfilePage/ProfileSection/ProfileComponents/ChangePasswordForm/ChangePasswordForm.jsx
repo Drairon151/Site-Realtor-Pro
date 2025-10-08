@@ -1,11 +1,9 @@
-import { useEffect } from "react"
 import EmailAuth from "../../../../../components/Authorization/EmailAuth/EmailAuth"
 import useAuth from "../../../../../hooks/useAuth"
 import './ChangePasswordForm.css'
 
 export default function ChangePasswordForm({onClose}){
     const{
-        user,
         cooldownTimer,
         emailAuthStatus,
 
@@ -13,8 +11,6 @@ export default function ChangePasswordForm({onClose}){
         resendVerifyCodeChangePassword,
         changePassword,
     }=useAuth()
-
-    console.log(emailAuthStatus)
 
     return(
 

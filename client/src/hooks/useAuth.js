@@ -1,30 +1,27 @@
+import { useNavigate } from 'react-router-dom';
+
 import { useState, useEffect } from "react";
+import useUser from "./useUser";
 
 export default function useAuth(){
+    const {
+        user,
+        setUser,
+        cooldownTimer,
+        setIsLoading,
+        setCooldownTimer,
+        setUserAuthorized,
+    } = useUser();
 
-    const [user, setUser] = useState({
-        name: null,
-        surname: null,
-        patronymic: null,
-
-        _id : null,
-        role: null,
-
-        mail: null,
-        numberPhone: null,
-        isDiplomaVerified: false,
-    })
     const [emailAuthStatus, setEmailAuthStatus] = useState({
         status:null,
         type:null,
     });
-    const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState(false)
-    const [userAuthorized, setUserAuthorized] = useState(false)
-    const [cooldownTimer, setCooldownTimer] = useState(0)
-
 
     const API_AUTH = 'http://localhost:5000/api/auth';
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (cooldownTimer > 0) {
@@ -32,41 +29,9 @@ export default function useAuth(){
             setCooldownTimer(cooldownTimer - 1);
         }, 1000);
 
-        return () => clearTimeout(timerId); // Очистка при размонтировании или изменении
+        return () => clearTimeout(timerId);
         }
     }, [cooldownTimer]); 
-
-
-    useEffect(()=>{
-        const checkAuth = async () => {
-            console.log('Проверка авторизации')
-            try {
-
-                const response = await fetch('http://localhost:5000/api/me', {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-
-                if (!response.ok) {
-                    throw new Error(response.message || 'Ошибка проверки авторизации')
-                }
-
-                const result = await response.json();
-                setUserAuthorized(true)
-                localStorage.setItem('userData',JSON.stringify(result.user))
-                setUser(result.user);
-
-            } catch (err) {
-                setUserAuthorized(false)
-                setError(true)
-            }finally{
-                setIsLoading(false)
-            }
-        };
-
-        checkAuth()
-    
-    },[])
 
     const registration = async (event)=>{
         event.preventDefault()
@@ -147,7 +112,7 @@ export default function useAuth(){
 
             const result = await response.json()
 
-            window.location.href = '/';
+            navigate('/', { replace: true });
             
             localStorage.setItem('userData',JSON.stringify({...user, ...result.user}))
             setUserAuthorized(true)
@@ -197,7 +162,7 @@ export default function useAuth(){
             setEmailAuthStatus({status:null, type:null,})
             localStorage.setItem('userData',JSON.stringify(user))
 
-            window.location.href = '/';
+            navigate('/', { replace: true });
 
 
         }catch(error){            
@@ -270,7 +235,7 @@ export default function useAuth(){
                 type:null,
             })
             setUserAuthorized(false)
-            window.location.href = '/';
+            navigate('/', { replace: true });
         }catch(error){
             setError(true)
         }finally{
@@ -279,147 +244,6 @@ export default function useAuth(){
 
     }
 
-    const verifyCodeChangePassword = async(event)=>{
-        event.preventDefault()
-        setError(false);
-        setIsLoading(true)
-
-        const formData = new FormData(event.target);
-        const userData = {
-            _id: user._id,
-            code: formData.get('emailCode'),
-        };
-
-        try{
-            const response = await fetch(`${API_AUTH}/change-password`,{
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData),
-                credentials: 'include',
-            })
-
-            const result = await response.json();
-
-
-            if(!response.ok){
-                setEmailAuthStatus({...emailAuthStatus, type: result.type} )
-
-                throw new Error(response.message || 'Ошибка отправки кода подтверждения на сервер')
-            }
-
-            setEmailAuthStatus({status: 'code-success' , type: 'success'})
-            localStorage.setItem('userData',JSON.stringify(user))
-        }catch(error){
-
-
-
-            setError(true);
-
-        }finally{
-            
-            setIsLoading(false)
-        }
-    }
-
-    const changePassword = async(event)=>{
-        event.preventDefault()
-
-        setIsLoading(true)
-        const formData = new FormData(event.target);
-        const userData = {
-            _id: user._id,
-            oldPassword: formData.get('oldPassword'),
-            newPassword: formData.get('newPassword'), 
-        }
-        console.log(userData)
-        try{
-            const response = await fetch(`${API_AUTH}/change-password`, {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData),
-                credentials: 'include',
-            });
-
-            if(!response.ok){
-                throw new Error(response.message || 'Ошибка смены пароля')
-
-            }
-            window.location.href = '/ProfilePage';
-
-        }catch(error){
-            setError(true)
-
-        }finally{
-            setIsLoading(false)
-        }
-
-    }
-
-    const sendVerifyCodeChangePassword = async ()=>{
-        setIsLoading(true)
-        try{
-
-            const response = await fetch(`${API_AUTH}/send-password-reset-code`, {
-                method: 'POST',
-                headers:{
-                    'Content-Type':'application/json',
-                },
-                body: JSON.stringify({ _id: user._id }),
-                credentials: 'include',
-            });
-            if(!response.ok){
-                throw new Error(response.message || 'Ошибка запроса на отправку кода подтверждения')
-            }
-            setEmailAuthStatus({
-                status: 'code-not-success',
-                type: 'wait',
-            })
-        }catch(error){
-            console.log(error.message)
-        }
-    }
-
-    const resendVerifyCodeChangePassword = async()=>{
-        setIsLoading(true)
-        event.preventDefault()
-
-        setIsLoading(true)
-        setError(false);
-
-        const userData = {
-            _id: user._id
-        };
-
-        console.log(userData)
-
-        try{
-            const response = await fetch(`${API_AUTH}/resend-password-reset-code`,{
-                method: 'POST',
-                headers:{
-                    'Content-Type':'application/json'
-                },
-                body: JSON.stringify(userData),
-                credentials: 'include',
-            })
-
-            if(!response.ok){
-                throw new Error(response.message || 'Ошибка подтверждения кода')
-            }
-            
-            const result = await response.json()
-            console.log(result.cooldown)
-            setCooldownTimer(result.cooldown);
-        }catch(error){
-            console.log(error.message)
-        }finally{
-            setIsLoading(false)
-        }
-
-    };
 
     return {        
         registration,
@@ -429,17 +253,8 @@ export default function useAuth(){
         
         logout,
 
-        changePassword,
-        verifyCodeChangePassword,
-        sendVerifyCodeChangePassword,
-        resendVerifyCodeChangePassword,
-
-        cooldownTimer,
-        isLoading,
         error,
         emailAuthStatus,
-        user,
-        userAuthorized,
     }
     
 }

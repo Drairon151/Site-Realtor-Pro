@@ -3,11 +3,21 @@ import plug from '../../../../assets/img/icons/plug.png'
 import Modal from '../../../../components/Modal/Modal'
 import ChangePasswordForm from '../ProfileComponents/ChangePasswordForm/ChangePasswordForm'
 import { useEffect, useState } from 'react'
+import useUser from '../../../../hooks/useUser'
 
-export default function ProfileUserCard({user, logout, sendVerifyCodeChangePassword}){
+export default function ProfileUserCard({logout, sendVerifyCodeChangePassword}){    
+    const {
+        user,
+        updateUserField,
+    } = useUser()
+
+
     const [isOpen, setIsOpen] = useState(false);
-
     const [editUser, setEditUser] = useState(user)
+
+    useEffect(() => {
+        setEditUser(user);
+    }, [user]); 
 
     function editUserChangeOnClick(event){
         const {name, value} = event.target;
@@ -18,8 +28,13 @@ export default function ProfileUserCard({user, logout, sendVerifyCodeChangePassw
         },[])
     }
 
-    function editUserSaveOnBlur(event){
-        console.log('Разблюр')
+    function handlerUserChangeSave(event){
+        const {name, value} = event.target;
+        if(value.length != null && value.length != undefined){
+            updateUserField(name, value)        
+        }else{
+            console.log('Данные пусты')
+        }
     }
 
     return(
@@ -29,86 +44,102 @@ export default function ProfileUserCard({user, logout, sendVerifyCodeChangePassw
 
                 <div className='user-basic-info'>
                     <img className='user-basic-info_avatar' src={plug}/>
-                    <h1 className='user-basic-info_name'>{user.name}</h1>
+                    <h1 className='user-basic-info_name'>{user.name?? 'Имя'}</h1>
                 </div>
 
                 <div className='user-contact-info'>
                     <div className='user-contact-info_item'>
-                        <label className='user-contact-info_item--lable' htmlFor='userName'>
+                        <label className='user-contact-info_item--lable' htmlFor='surname'>
                             Фамилия:
                         </label>
                         <input 
                             className='user-contact-info_item--input' 
                             name='surname' 
                             type='text' 
-                            value={editUser.surname}
+                            value={editUser.surname ?? 'Фамилия'}
                             onChange={editUserChangeOnClick}
-                            onBlur={editUserSaveOnBlur}
+                            onBlur={handlerUserChangeSave}
                         ></input>
                     </div>
                     <div className='user-contact-info_item'>
-                        <label className='user-contact-info_item--lable' htmlFor='userName'>
+                        <label className='user-contact-info_item--lable' htmlFor='name'>
                             Имя:
                         </label>
                         <input 
                             className='user-contact-info_item--input' 
                             name='name' 
                             type='text' 
-                            value={editUser.name}
+                            value={editUser.name ?? 'Имя'}
                             onChange={editUserChangeOnClick}
-                            onBlur={editUserSaveOnBlur}
+                            onBlur={handlerUserChangeSave}
                         ></input>
                     </div>
                     <div className='user-contact-info_item'>
-                        <label className='user-contact-info_item--lable' htmlFor='userName'>
+                        <label className='user-contact-info_item--lable' htmlFor='patronymic'>
                             Отчество:
                         </label>
                         <input 
                             className='user-contact-info_item--input' 
                             name='patronymic' 
                             type='text' 
-                            value={editUser.patronymic}
+                            value={editUser.patronymic ?? 'Отчество'}
                             onChange={editUserChangeOnClick}
-                            onBlur={editUserSaveOnBlur}
+                            onBlur={handlerUserChangeSave}
                         ></input>
                     </div>
                     <div className='user-contact-info_item'>
-                        <label className='user-contact-info_item--lable' htmlFor='userName'>
+                        <label className='user-contact-info_item--lable' htmlFor='mail'>
                             Почта:
                         </label>
                         <input
                             className='user-contact-info_item--input' 
                             name='mail' 
                             type='text' 
-                            value={editUser.mail}
+                            value={editUser.mail ?? 'example@mail.com'}
                             onChange={editUserChangeOnClick}
-                            onBlur={editUserSaveOnBlur}
+                            onBlur={handlerUserChangeSave}
                         ></input>
                     </div>
                     <div className='user-contact-info_item'>
-                        <label className='user-contact-info_item--lable' htmlFor='userName'>
+                        <label className='user-contact-info_item--lable' htmlFor='numberPhone'>
                             Номер телефона:
                         </label>
                         <input 
                             className='user-contact-info_item--input' 
                             name='numberPhone' 
                             type='text' 
-                            value={editUser.numberPhone}
+                            value={editUser.numberPhone?? '+7(880)5553535'}
                             onChange={editUserChangeOnClick}
-                            onBlur={editUserSaveOnBlur}
+                            onBlur={handlerUserChangeSave}
                         ></input>
                     </div>
+
                     <div className='user-contact-info_item'>
-                        <label className='user-contact-info_item--lable' htmlFor='userName'>
-                            Роль пользователя:
+
+                        <label className='user-contact-info_item--lable' htmlFor='role'>
+                            Клиент:
                         </label>
                         <input 
-                            className='user-contact-info_item--input' 
+                            className='user-contact-info_item--input-radio'
                             name='role' 
-                            type='text' 
-                            value={editUser.role}
+                            type='radio' 
+                            value='client'
+                            checked={user.role === 'client'}
                             onChange={editUserChangeOnClick}
-                            onBlur={editUserSaveOnBlur}
+                            onClick={handlerUserChangeSave}
+                        ></input>
+
+                        <label className='user-contact-info_item--lable' htmlFor='role'>
+                            Риэлтор:
+                        </label>
+                        <input 
+                            className='user-contact-info_item--input-radio'
+                            name='role' 
+                            type='radio' 
+                            value='realtor'
+                            checked={user.role === 'realtor'}
+                            onChange={editUserChangeOnClick}
+                            onClick={handlerUserChangeSave}
                         ></input>
                     </div>
                 </div>
