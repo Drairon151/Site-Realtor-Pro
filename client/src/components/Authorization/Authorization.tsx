@@ -25,21 +25,21 @@ export default function Authorization(){
                 ): userAuthorized ? (
                     <button 
                         className="nav-button nav-button_profile"
-                        onClick={() => navigate('/ProfilePage')}
+                        onClick={() => navigate('/profile')}
                     >{user.name}</button>
                 ):(
                     <>
 
                         <button 
                             className="nav-button nav-button_registration"
-                            onClick={() => navigate('/RegistrationPage')}
+                            onClick={() => navigate('/registration')}
                         >
                             Регистрация
                         </button>
 
                         <button 
                             className="nav-button nav-button_login"
-                            onClick={() => navigate('/LoginPage')}
+                            onClick={() => navigate('/login')}
                         >
                             Вход
                         </button>

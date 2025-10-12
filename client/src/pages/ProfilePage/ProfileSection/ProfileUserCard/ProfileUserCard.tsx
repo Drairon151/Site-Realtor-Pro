@@ -2,15 +2,21 @@ import './ProfileUserCard.css'
 import plug from '../../../../assets/img/icons/plug.png'
 import Modal from '../../../../components/Modal/Modal'
 import ChangePasswordForm from '../ProfileComponents/ChangePasswordForm/ChangePasswordForm'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, FormEvent } from 'react'
 import useUser from '../../../../hooks/useUser'
+import useAuth from '../../../../hooks/useAuth'
 
-export default function ProfileUserCard({logout, sendVerifyCodeChangePassword}){    
+
+export default function ProfileUserCard(){    
     const {
         user,
         updateUserField,
+        sendVerifyCodeChangePassword,
     } = useUser()
 
+    const {
+        logout,
+    } = useAuth()
 
     const [isOpen, setIsOpen] = useState(false);
     const [editUser, setEditUser] = useState(user)
@@ -19,17 +25,19 @@ export default function ProfileUserCard({logout, sendVerifyCodeChangePassword}){
         setEditUser(user);
     }, [user]); 
 
-    function editUserChangeOnClick(event){
-        const {name, value} = event.target;
+    function editUserChangeOnClick(event: FormEvent<HTMLFormElement>){
+        const {name, value} = event.currentTarget;
         setEditUser(prev=>{
+            if(!prev){return null}
+
             const update = {...prev}
             update[name] = value
             return update
         },[])
     }
 
-    function handlerUserChangeSave(event){
-        const {name, value} = event.target;
+    function handlerUserChangeSave(event: FormEvent<HTMLFormElement>){
+        const {name, value} = event.currentTarget;
         if(value.length != null && value.length != undefined){
             updateUserField(name, value)        
         }else{
@@ -44,7 +52,7 @@ export default function ProfileUserCard({logout, sendVerifyCodeChangePassword}){
 
                 <div className='user-basic-info'>
                     <img className='user-basic-info_avatar' src={plug}/>
-                    <h1 className='user-basic-info_name'>{user.name?? 'Имя'}</h1>
+                    <h1 className='user-basic-info_name'>{user? user.name :'Имя'}</h1>
                 </div>
 
                 <div className='user-contact-info'>
@@ -56,7 +64,7 @@ export default function ProfileUserCard({logout, sendVerifyCodeChangePassword}){
                             className='user-contact-info_item--input' 
                             name='surname' 
                             type='text' 
-                            value={editUser.surname ?? 'Фамилия'}
+                            value={editUser? editUser.surname : 'Фамилия'}
                             onChange={editUserChangeOnClick}
                             onBlur={handlerUserChangeSave}
                         ></input>
@@ -114,34 +122,43 @@ export default function ProfileUserCard({logout, sendVerifyCodeChangePassword}){
                         ></input>
                     </div>
 
-                    <div className='user-contact-info_item'>
 
-                        <label className='user-contact-info_item--lable' htmlFor='role'>
-                            Клиент:
-                        </label>
-                        <input 
-                            className='user-contact-info_item--input-radio'
-                            name='role' 
-                            type='radio' 
-                            value='client'
-                            checked={user.role === 'client'}
-                            onChange={editUserChangeOnClick}
-                            onClick={handlerUserChangeSave}
-                        ></input>
+                    {
+                        user.role=='admin' ? (
+                            // Да сейчас тут заглушка
+                            <p style={{color: 'white'}}>ВЫ АДМИН</p>
+                        ):(
+                            <div className='user-contact-info_item'>
 
-                        <label className='user-contact-info_item--lable' htmlFor='role'>
-                            Риэлтор:
-                        </label>
-                        <input 
-                            className='user-contact-info_item--input-radio'
-                            name='role' 
-                            type='radio' 
-                            value='realtor'
-                            checked={user.role === 'realtor'}
-                            onChange={editUserChangeOnClick}
-                            onClick={handlerUserChangeSave}
-                        ></input>
-                    </div>
+                                <label className='user-contact-info_item--lable' htmlFor='role'>
+                                    Клиент:
+                                </label>
+                                <input 
+                                    className='user-contact-info_item--input-radio'
+                                    name='role' 
+                                    type='radio' 
+                                    value='client'
+                                    checked={user.role === 'client'}
+                                    onChange={editUserChangeOnClick}
+                                    onClick={handlerUserChangeSave}
+                                ></input>
+
+                                <label className='user-contact-info_item--lable' htmlFor='role'>
+                                    Риэлтор:
+                                </label>
+                                <input 
+                                    className='user-contact-info_item--input-radio'
+                                    name='role' 
+                                    type='radio' 
+                                    value='realtor'
+                                    checked={user.role === 'realtor'}
+                                    onChange={editUserChangeOnClick}
+                                    onClick={handlerUserChangeSave}
+                                ></input>
+                            </div>
+                        )
+                    }
+
                 </div>
 
             </div>

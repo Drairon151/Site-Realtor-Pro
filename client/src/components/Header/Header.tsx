@@ -3,7 +3,7 @@ import siteLogo from '../../assets/img/icons/siteLogo.png'
 
 import { menuItems } from "../../data/menuItems"
 
-import HeaderMenuLi from "../headerMenuLi"
+import HeaderMenuLi from "../HeaderMenuLi"
 import { useNavigate } from 'react-router-dom';
 import Authorization from '../Authorization/Authorization'
 
@@ -20,16 +20,6 @@ export default function Header(){
                 <img className="header_logo" src={siteLogo} alt="Лого"/>
                 <p className="header_logo-text">Риэлтор профи</p>
             </button>
-
-            {/* <ul className="header_menu flex center">
-                {menuItems.map(item=>(
-                    <HeaderMenuLi 
-                                nameClass={item.nameClass}
-                                link={item.link}
-                                text={item.text}
-                    ></HeaderMenuLi>
-                ))}
-            </ul> */}
 
                 <Authorization/>
             

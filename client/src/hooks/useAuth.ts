@@ -1,25 +1,33 @@
 import { useNavigate } from 'react-router-dom';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent  } from "react";
 import useUser from "./useUser";
+import {User} from "../types/user"
 
 export default function useAuth(){
+    interface EmailAuthStatus{
+        status: string,
+        type: string
+    }
+
     const {
         user,
         setUser,
+
         cooldownTimer,
         setIsLoading,
         setCooldownTimer,
         setUserAuthorized,
     } = useUser();
 
-    const [emailAuthStatus, setEmailAuthStatus] = useState({
-        status:null,
-        type:null,
+    const [emailAuthStatus, setEmailAuthStatus] = useState<EmailAuthStatus>({
+        status:'',
+        type:'',
     });
-    const [error, setError] = useState(false)
 
-    const API_AUTH = 'http://localhost:5000/api/auth';
+    const [error, setError] = useState<boolean>(false)
+
+    const API_AUTH:string = 'http://localhost:5000/api/auth';
 
     const navigate = useNavigate();
 
@@ -33,15 +41,14 @@ export default function useAuth(){
         }
     }, [cooldownTimer]); 
 
-    const registration = async (event)=>{
+    const registration = async (event: FormEvent<HTMLFormElement>)=>{
         event.preventDefault()
         setError(false);
         setIsLoading(true)
 
-        const formData = new FormData(event.target);
+        const formData = new FormData(event.currentTarget);
 
         const userData = {
-
             surname: formData.get('surname'),
             name: formData.get('name'),
             patronymic: formData.get('patronymic'),
@@ -50,6 +57,8 @@ export default function useAuth(){
             numberPhone: formData.get('numberPhone'),
             password: formData.get('password'),
             role: formData.get('role'),
+            isDiplomaVerified: false,
+
         };
 
         console.log('Данные пользователя: ', userData)
@@ -70,8 +79,11 @@ export default function useAuth(){
             }
 
             const result = await response.json();
-            
-            setUser({...userData, _id: result._id})
+
+            setUser({
+                ...userData,
+                _id: result._id,
+            }as User)
             setEmailAuthStatus({status:'wait-email-conf', type:'wait'})
             }catch(error){
                 setError(true)
@@ -81,11 +93,11 @@ export default function useAuth(){
             }
     }
 
-    const login = async (event)=>{
+    const login = async (event: FormEvent<HTMLFormElement>)=>{
         event.preventDefault()
         setIsLoading(true)
 
-        const formData = new FormData(event.target);
+        const formData = new FormData(event.currentTarget);
         
         const userData = {
             mail: formData.get('mail'),
@@ -106,15 +118,22 @@ export default function useAuth(){
             })
 
 
-            if(!response.ok){
-                throw new Error(response.message || 'Ошибка входа в аккаунт');
-            }
+                if (!response.ok) {
+
+                    try{
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Ошибка входа в аккаунт')
+                    }catch{
+                        throw new Error(`HTTP ${response.status} ${response.statusText}`)
+
+                    }
+
+                }
 
             const result = await response.json()
 
             navigate('/', { replace: true });
             
-            localStorage.setItem('userData',JSON.stringify({...user, ...result.user}))
             setUserAuthorized(true)
             setUser({...userData, ...result.user})
         }catch(error){
@@ -126,12 +145,15 @@ export default function useAuth(){
         }
     }
 
-    const verifyEmail = async(event)=>{
+    const verifyEmail = async(event: FormEvent<HTMLFormElement>)=>{
         event.preventDefault()
         setError(false);
         setIsLoading(true)
+        if(!user){
+            throw new Error('Пользователь не авторизован')   
+        }
 
-        const formData = new FormData(event.target);
+        const formData = new FormData(event.currentTarget);
         const userData = {
             _id: user._id,
             code: formData.get('emailCode'),
@@ -155,12 +177,17 @@ export default function useAuth(){
 
                 setEmailAuthStatus({...emailAuthStatus, type: result.type})
 
+                try{
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка проверки кода')
+                }catch{
+                    throw new Error(`HTTP ${response.status} ${response.statusText}`)
 
-                throw new Error(response.message || 'Ошибка отправки кода подтверждения на сервер')
+                }
+
             }
             
-            setEmailAuthStatus({status:null, type:null,})
-            localStorage.setItem('userData',JSON.stringify(user))
+            setEmailAuthStatus({status:'', type:'',})
 
             navigate('/', { replace: true });
 
@@ -178,6 +205,9 @@ export default function useAuth(){
     const resendVerification = async ()=>{
 
         setIsLoading(true)
+        if(!user){
+            throw new Error('Пользователь не авторизован')   
+        }
         try{
 
             const response = await fetch(`${API_AUTH}/resend-verification`, {
@@ -189,9 +219,17 @@ export default function useAuth(){
                 credentials: 'include',
             });
 
-            if(!response.ok){
-                throw new Error(response.message || 'Ошибка переотправки кода')
-            }
+                if (!response.ok) {
+
+                    try{
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Ошибка повторной отправки кода')
+                    }catch{
+                        throw new Error(`HTTP ${response.status} ${response.statusText}`)
+
+                    }
+
+                }
 
             const result = await response.json()
             console.log(result.cooldown)
@@ -200,7 +238,7 @@ export default function useAuth(){
         }catch(error){
             setError(true)
         }finally{
-            setIsLoading(true)
+            setIsLoading(false)
         }
 
     }
@@ -213,26 +251,22 @@ export default function useAuth(){
                 credentials: 'include',
             });
 
-            if(!response.ok){
-                throw new Error(response.message || 'Ошибка выхода из аккаунта')
-            }
+                if (!response.ok) {
 
-            localStorage.removeItem('userData')
-            setUser({
-                name: null,
-                surname: null,
-                patronymic: null,
+                    try{
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Ошибка выхода из аккаунта')
+                    }catch{
+                        throw new Error(`HTTP ${response.status} ${response.statusText}`)
 
-                _id : null,
-                role: null,
+                    }
 
-                mail: null,
-                numberPhone: null,
-                isDiplomaVerified: false,
-            })
+                }
+
+            setUser(null)
             setEmailAuthStatus({
-                status:null,
-                type:null,
+                status:'',
+                type:'',
             })
             setUserAuthorized(false)
             navigate('/', { replace: true });

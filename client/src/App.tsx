@@ -21,12 +21,13 @@ function App() {
 
         <Route element={<PublicLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="/RegistrationPage" element={<RegistrationPage />} />
-          <Route path="/LoginPage" element={<LoginPage />} />
+          <Route path="/registration" element={<RegistrationPage />} />
+          <Route path="/login" element={<LoginPage />} />
         </Route>
 
         <Route element={<AppLayout />}>
-          <Route path="/ProfilePage" element={<ProfilePage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          
         </Route>
       </Routes>
 

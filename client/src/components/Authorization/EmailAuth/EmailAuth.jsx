@@ -11,7 +11,7 @@ export default function EmailAuth({cooldownTimer, verifyEmail, resendVerificatio
             <input name="emailCode" className="form_input" type="number"></input>
 
             {
-                emailAuthStatus.type === 'wait' || emailAuthStatus.type === null ?(
+                emailAuthStatus.type === 'wait' ?(
                     null
                 ): emailAuthStatus.type === 'invalid_code' ?(
                     <p>Неверный код</p>

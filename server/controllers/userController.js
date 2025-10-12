@@ -16,7 +16,7 @@ const changePassword = async (req, res) => {
     if (!user) {
       console.log('❌ Пользователь не найден');
       return res.status(404).json({ 
-        status: 'error',
+        status: 'code-not-success',
         type:'error', 
         message: 'Пользователь не найден' });
     }
@@ -25,7 +25,7 @@ const changePassword = async (req, res) => {
     if (!resetData) {
       console.log('❌ Нет активной сессии сброса пароля для:', userId);
       return res.status(400).json({
-        status: 'error',
+        status: 'code-not-success',
         type:'error', 
         message: 'Сначала запросите код'
       });
@@ -35,7 +35,7 @@ const changePassword = async (req, res) => {
       console.log('⏳ Срок действия кода истёк. Удаление сессии для:', userId);
       delete global.passwordResetStore[userId];
       return res.status(400).json({
-        status: 'error',
+        status: 'code-not-success',
         type:'code_expired', 
         message: 'Срок действия кода истёк. Запросите новый.'
       });
@@ -47,7 +47,7 @@ const changePassword = async (req, res) => {
       if (code !== resetData.code) {
         console.log('❌ Неверный код подтверждения');
         return res.status(400).json({
-          status: 'error',
+          status: 'code-not-success',
           type: 'invalid_code',
           message: 'Неверный код'
         });
@@ -68,7 +68,7 @@ const changePassword = async (req, res) => {
       if (!isMatch) {
         console.log('❌ Старый пароль не совпадает');
         return res.status(400).json({
-          status: 'error',
+          status: 'code-not-success',
           message: 'Неверный текущий пароль'
         });
       }

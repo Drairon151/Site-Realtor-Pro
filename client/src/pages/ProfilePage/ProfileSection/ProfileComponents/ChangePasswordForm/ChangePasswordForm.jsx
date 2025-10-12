@@ -1,30 +1,30 @@
 import EmailAuth from "../../../../../components/Authorization/EmailAuth/EmailAuth"
-import useAuth from "../../../../../hooks/useAuth"
+import useUser from "../../../../../hooks/useUser"
 import './ChangePasswordForm.css'
 
 export default function ChangePasswordForm({onClose}){
     const{
         cooldownTimer,
-        emailAuthStatus,
+        emailVerificationStatus,
 
         verifyCodeChangePassword,
         resendVerifyCodeChangePassword,
         changePassword,
-    }=useAuth()
+    }=useUser()
 
     return(
 
         <>
         
         {
-            emailAuthStatus.status === null ?(
+            emailVerificationStatus.status === 'code-not-success' ?(
                 <EmailAuth
                     cooldownTimer={cooldownTimer}
                     verifyEmail={verifyCodeChangePassword}
                     resendVerification={resendVerifyCodeChangePassword}
-                    emailAuthStatus={emailAuthStatus}
+                    emailAuthStatus={emailVerificationStatus}
                 />
-            ):emailAuthStatus.status === 'code-success' ?(
+            ):emailVerificationStatus.status === 'code-success' ?(
                 <form onSubmit={changePassword} className="form change-password-form">
                     <label className="form_lable change-password-form_lable" htmlFor="oldPassword">Ваш актуальный пароль</label>
                     <input className="form_input change-password-form_input" name="oldPassword" type="password"></input>
