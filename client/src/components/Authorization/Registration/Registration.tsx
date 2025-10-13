@@ -1,4 +1,8 @@
-export default function Registration({registration}){
+interface RegistrationProps{
+    registration: (event: React.FormEvent<HTMLFormElement>)=>{}
+}
+
+export default function Registration({registration}:RegistrationProps){
     
     return(
 
@@ -18,7 +22,7 @@ export default function Registration({registration}){
 
                 
                 <p>Кто вы?</p>
-                <label className='form_lable' htmlFor='userName' value="client">
+                <label className='form_lable' htmlFor='userName'>
                     Клиент:
                 </label>
                 <input name='role' type='radio' value='client' className="form_input" ></input>

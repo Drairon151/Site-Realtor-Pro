@@ -1,6 +1,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from 'react-router-dom';
 import {User} from '../types/user'
+import { EmailStatus } from "../types/emailStatus";
 
 export default function useUser(){
     const navigate = useNavigate()
@@ -9,10 +10,7 @@ export default function useUser(){
         user: User;
     }
 
-    interface EmailVerificationStatus{
-        status: string,
-        type: string,
-    }
+
 
     interface ResultUpdateUserField{
         status: string,
@@ -22,7 +20,7 @@ export default function useUser(){
 
     const [user, setUser] = useState<User | null>(null)
 
-    const [emailVerificationStatus, setEmailVerificationStatus] = useState<EmailVerificationStatus>({
+    const [emailVerificationStatus, setEmailVerificationStatus] = useState<EmailStatus>({
         status:'code-not-success',
         type:'',
     });
@@ -305,12 +303,12 @@ export default function useUser(){
             const result:ResultUpdateUserField = await response.json()
             
             setUser(prev => {
-            if (!prev) return null;
+                if (!prev) return null;
 
-            return {
-                ...prev,
-                [result.updatedField]: result.updatedValue,
-            } as User;
+                return {
+                    ...prev,
+                    [result.updatedField]: result.updatedValue,
+                } as User;
             });
 
             }catch(error){

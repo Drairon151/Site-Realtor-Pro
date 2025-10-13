@@ -1,7 +1,6 @@
 import './Authorization.css'
 import '../../styles/forms.css'
 import { useNavigate } from 'react-router-dom';
-import useAuth from "../../hooks/useAuth";
 import useUser from '../../hooks/useUser';
 
 
@@ -10,9 +9,6 @@ export default function Authorization(){
 
     const {
         isLoading,
-    } = useAuth()
-
-    const {
         user,
         userAuthorized,
     } = useUser()
@@ -26,7 +22,7 @@ export default function Authorization(){
                     <button 
                         className="nav-button nav-button_profile"
                         onClick={() => navigate('/profile')}
-                    >{user.name}</button>
+                    >{user? user.name: 'Нет данных'}</button>
                 ):(
                     <>
 

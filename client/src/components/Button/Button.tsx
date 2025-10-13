@@ -1,6 +1,11 @@
 import './Button.css'
 
-export default function Button({buttonClick, children}){
+interface ButtonProps{
+    buttonClick: ()=>{}, 
+    children: React.ReactNode;
+}
+
+export default function Button({buttonClick, children}:ButtonProps){
     return(
         <button
             className="button"

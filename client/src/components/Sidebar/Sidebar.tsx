@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import useUser from '../../hooks/useUser';
 import './Sidebar.css'
 
-export default function(){
+export default function Sidebar(){
     const {
         user,
         isLoading,
@@ -25,14 +25,14 @@ export default function(){
     if(user.role == 'realtor'){
         menuItems.push(
             { label: 'Создать обьявление', path: '/listings/' },
-            { label: 'Мои обьявления', path: '/listings/my' },
+            { label: 'Мои объявления', path: '/listings/my' },
             { label: 'Мои отзывы', path: '/reviews' },
         );
     }
 
     if(user.role == 'admin'){
         menuItems.push(
-            { label: 'Ферификация', path: '/admin/verification' },
+            { label: 'Верификация', path: '/admin/verification' },
         );
     }
 

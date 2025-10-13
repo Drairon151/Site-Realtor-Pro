@@ -1,6 +1,12 @@
 import './FeaturesCard.css'
 
-export default function FeaturesCard({cardImg, cardTitle, cardText}){
+interface FeaturesCardProps{
+    cardImg: string,
+    cardTitle: string,
+    cardText: string,
+}
+
+export default function FeaturesCard({cardImg , cardTitle, cardText}:FeaturesCardProps){
     return(
         <li className="features_cards-card flex">
             <img className="features_cards-icon" src={cardImg}/>

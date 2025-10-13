@@ -1,6 +1,7 @@
 import EmailAuth from "../../../components/Authorization/EmailAuth/EmailAuth";
 import Registration from "../../../components/Authorization/Registration/Registration";
 import useAuth from "../../../hooks/useAuth";
+import useUser from "../../../hooks/useUser";
 
 export default function RegistrationPage(){
     const {
@@ -8,9 +9,12 @@ export default function RegistrationPage(){
         verifyEmail,
         resendVerification,
 
-        cooldownTimer,
         emailAuthStatus,
     } = useAuth()
+
+    const {
+        cooldownTimer,
+    } = useUser()
 
 
     return(

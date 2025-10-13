@@ -1,6 +1,18 @@
 import './EmailAuth.css'
+import { EmailStatus } from '../../../types/emailStatus'
+interface EmailAuthProps{
+    cooldownTimer: number, 
+    verifyEmail:(event: React.FormEvent<HTMLFormElement>)=>{} , 
+    resendVerification: ()=>{}, 
+    emailAuthStatus:EmailStatus,
+}
 
-export default function EmailAuth({cooldownTimer, verifyEmail, resendVerification, emailAuthStatus}){
+export default function EmailAuth(
+    {   cooldownTimer, 
+        verifyEmail, 
+        resendVerification, 
+        emailAuthStatus
+    }:EmailAuthProps){
     
     return(
         <form className="form emal-auth-form" onSubmit={verifyEmail}>

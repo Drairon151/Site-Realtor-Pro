@@ -1,9 +1,6 @@
 import './Header.css'
 import siteLogo from '../../assets/img/icons/siteLogo.png'
 
-import { menuItems } from "../../data/menuItems"
-
-import HeaderMenuLi from "../HeaderMenuLi"
 import { useNavigate } from 'react-router-dom';
 import Authorization from '../Authorization/Authorization'
 

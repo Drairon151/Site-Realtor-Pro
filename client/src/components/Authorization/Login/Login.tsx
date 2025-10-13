@@ -1,4 +1,8 @@
-export default function Login({login, onClose}){
+interface LoginProps{
+    login: (event: React.FormEvent<HTMLFormElement>)=>{},
+    onClose: ()=>void,
+}
+export default function Login({login}:LoginProps){
     return(
             <form className="form center" onSubmit={login}>
                 <label className="form_lable">Email:</label>
@@ -8,8 +12,6 @@ export default function Login({login, onClose}){
                 <input name="password" className="form_input" type="password"></input>
 
                 <button type="submit" className="form_button">Отправить</button>
-
-                <button onClick={onClose} className="form_button">✖️</button>
 
             </form>
     )
