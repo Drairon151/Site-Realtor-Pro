@@ -2,10 +2,11 @@ import './ProfileUserCard.css'
 import plug from '../../../../assets/img/icons/plug.png'
 import Modal from '../../../../components/Modal/Modal'
 import ChangePasswordForm from '../ProfileComponents/ChangePasswordForm/ChangePasswordForm'
-import { useEffect, useState, FormEvent } from 'react'
+import { useEffect, useState } from 'react'
 import useUser from '../../../../hooks/useUser'
 import useAuth from '../../../../hooks/useAuth'
 
+import { User } from '../../../../types/user'
 
 export default function ProfileUserCard(){    
     const {
@@ -25,18 +26,33 @@ export default function ProfileUserCard(){
         setEditUser(user);
     }, [user]); 
 
-    function editUserChangeOnClick(event: FormEvent<HTMLFormElement>){
-        const {name, value} = event.currentTarget;
-        setEditUser(prev=>{
-            if(!prev){return null}
 
+    function editUserChangeOnClick(event: React.ChangeEvent<HTMLInputElement>|React.MouseEvent<HTMLInputElement>){
+
+        const allowedFields = ['name', 'surname', 'patronymic', '_id', 'role', 'mail', 'numberPhone'] as const;
+        type StringField = typeof allowedFields[number];
+
+        const isStringField = (key: string): key is StringField => {
+            return allowedFields.includes(key as StringField);
+        };
+
+
+        const {name, value} = event.currentTarget;
+
+        setEditUser(prev=>{
+            if(!prev){
+                return null
+            }
             const update = {...prev}
-            update[name] = value
+            
+            if(isStringField(name)){
+                update[name] = value
+            }
             return update
-        },[])
+        })
     }
 
-    function handlerUserChangeSave(event: FormEvent<HTMLFormElement>){
+    function handlerUserChangeSave(event: React.FocusEvent<HTMLInputElement>){
         const {name, value} = event.currentTarget;
         if(value.length != null && value.length != undefined){
             updateUserField(name, value)        
@@ -77,7 +93,7 @@ export default function ProfileUserCard(){
                             className='user-contact-info_item--input' 
                             name='name' 
                             type='text' 
-                            value={editUser.name ?? 'Имя'}
+                            value={editUser? editUser.name : 'Имя'}
                             onChange={editUserChangeOnClick}
                             onBlur={handlerUserChangeSave}
                         ></input>
@@ -90,7 +106,7 @@ export default function ProfileUserCard(){
                             className='user-contact-info_item--input' 
                             name='patronymic' 
                             type='text' 
-                            value={editUser.patronymic ?? 'Отчество'}
+                            value={editUser? editUser.patronymic : 'Отчество'}
                             onChange={editUserChangeOnClick}
                             onBlur={handlerUserChangeSave}
                         ></input>
@@ -103,7 +119,7 @@ export default function ProfileUserCard(){
                             className='user-contact-info_item--input' 
                             name='mail' 
                             type='text' 
-                            value={editUser.mail ?? 'example@mail.com'}
+                            value={editUser? editUser.mail : 'example@mail.com'}
                             onChange={editUserChangeOnClick}
                             onBlur={handlerUserChangeSave}
                         ></input>
@@ -116,7 +132,7 @@ export default function ProfileUserCard(){
                             className='user-contact-info_item--input' 
                             name='numberPhone' 
                             type='text' 
-                            value={editUser.numberPhone?? '+7(880)5553535'}
+                            value={editUser? editUser.numberPhone : '+7(880)5553535'}
                             onChange={editUserChangeOnClick}
                             onBlur={handlerUserChangeSave}
                         ></input>
@@ -124,7 +140,7 @@ export default function ProfileUserCard(){
 
 
                     {
-                        user.role=='admin' ? (
+                        user!.role=='admin' ? (
                             // Да сейчас тут заглушка
                             <p style={{color: 'white'}}>ВЫ АДМИН</p>
                         ):(
@@ -138,7 +154,7 @@ export default function ProfileUserCard(){
                                     name='role' 
                                     type='radio' 
                                     value='client'
-                                    checked={user.role === 'client'}
+                                    checked={user!.role === 'client'}
                                     onChange={editUserChangeOnClick}
                                     onClick={handlerUserChangeSave}
                                 ></input>
@@ -151,7 +167,7 @@ export default function ProfileUserCard(){
                                     name='role' 
                                     type='radio' 
                                     value='realtor'
-                                    checked={user.role === 'realtor'}
+                                    checked={user!.role === 'realtor'}
                                     onChange={editUserChangeOnClick}
                                     onClick={handlerUserChangeSave}
                                 ></input>
