@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css'
-import Header from './components/Header/Header'
-import Footer from './components/Footer/Footer'
+// import Header from './components/Header/Header'
+// import Footer from './components/Footer/Footer'
 import HomePage from './pages/HomePage/HomePage'
 import ProfilePage from './pages/ProfilePage/ProfilePage'
 import RegistrationPage from './pages/AuthorizationPages/RegistrationPage/RegistrationPage';
@@ -14,7 +14,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Header/>
+
         <main>
           
       <Routes>
@@ -32,7 +32,6 @@ function App() {
       </Routes>
 
         </main> 
-      <Footer/>
     </BrowserRouter>
   )
 }

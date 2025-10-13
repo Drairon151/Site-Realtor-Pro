@@ -1,7 +1,6 @@
 import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from 'react-router-dom';
 import {User} from '../types/user'
-import { EmailStatus } from "../types/emailStatus";
 
 export default function useUser(){
     const navigate = useNavigate()
@@ -10,7 +9,10 @@ export default function useUser(){
         user: User;
     }
 
-
+    interface EmailVerificationStatus{
+        status: string,
+        type: string,
+    }
 
     interface ResultUpdateUserField{
         status: string,
@@ -20,7 +22,7 @@ export default function useUser(){
 
     const [user, setUser] = useState<User | null>(null)
 
-    const [emailVerificationStatus, setEmailVerificationStatus] = useState<EmailStatus>({
+    const [emailVerificationStatus, setEmailVerificationStatus] = useState<EmailVerificationStatus>({
         status:'code-not-success',
         type:'',
     });
@@ -30,10 +32,12 @@ export default function useUser(){
     const [cooldownTimer, setCooldownTimer] = useState<number>(0);
     const [userAuthorized, setUserAuthorized] = useState<boolean>(false)
     const [isLoading, setIsLoading] = useState<boolean>(false)
-
+    const [userLoading, setUserLoading] = useState<boolean>(false);
     
     useEffect(()=>{
         const checkAuth = async () => {
+            setUserLoading(true)
+
             console.log('Проверка авторизации')
             try {
 
@@ -57,7 +61,7 @@ export default function useUser(){
                 const result = await response.json() as MeResponse;
                 setUserAuthorized(true)
                 setUser(result.user);
-
+                console.log('Данные успешно получены',result.user)
             }catch(error){
                 if (error instanceof Error) {
                     console.log(error.message);
@@ -66,7 +70,7 @@ export default function useUser(){
                     console.log('Ошибка:', error);
                 }
             }finally{
-                setIsLoading(false)
+                setUserLoading(false)
 
             }
         };
@@ -339,7 +343,8 @@ export default function useUser(){
         resendVerifyCodeChangePassword,
 
         updateUserField,
-
+        
+        userLoading,
         userAuthorized, 
         setUserAuthorized,
     }

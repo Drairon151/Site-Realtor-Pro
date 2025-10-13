@@ -8,7 +8,7 @@ export default function Authorization(){
   const navigate = useNavigate();
 
     const {
-        isLoading,
+        userLoading,
         user,
         userAuthorized,
     } = useUser()
@@ -16,7 +16,7 @@ export default function Authorization(){
     return(
         <div className="nav flex center">
             {
-                isLoading ?(
+                userLoading ?(
                     <p>Загрузка...</p>
                 ): userAuthorized ? (
                     <button 
