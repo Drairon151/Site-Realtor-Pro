@@ -15,17 +15,18 @@ export default function ProfileUserCard(){
         sendVerifyCodeChangePassword,
     } = useUserContext()
 
-    const {
-        logout,
-    } = useAuth()
+}
+
+export default function ProfileUserCard({user, updateUserField, sendVerifyCodeChangePassword, logout}:ProfileUserCardProps){    
 
     const [isOpen, setIsOpen] = useState(false);
-    const [editUser, setEditUser] = useState(user)
+    const [editUser, setEditUser] = useState<User>(user)
 
     useEffect(() => {
         setEditUser(user);
     }, [user]); 
 
+    function editUserChangeOnClick(event: React.ChangeEvent<HTMLInputElement>){
 
     function editUserChangeOnClick(event: React.ChangeEvent<HTMLInputElement>|React.MouseEvent<HTMLInputElement>){
 
@@ -41,21 +42,17 @@ export default function ProfileUserCard(){
         const {name, value} = event.currentTarget;
 
         setEditUser(prev=>{
-            if(!prev){
-                return null
+
+            return {
+                ...prev,
+                [inputData.name] : inputData.value,
             }
-            const update = {...prev}
-            
-            if(isStringField(name)){
-                update[name] = value
-            }
-            return update
         })
     }
 
     function handlerUserChangeSave(event: React.FocusEvent<HTMLInputElement>|React.MouseEvent<HTMLInputElement>){
         const {name, value} = event.currentTarget;
-        if(value.length != null && value.length != undefined){
+        if(value.length != null){
             updateUserField(name, value)        
         }else{
             console.log('Данные пусты')
@@ -69,7 +66,7 @@ export default function ProfileUserCard(){
 
                 <div className='user-basic-info'>
                     <img className='user-basic-info_avatar' src={plug}/>
-                    <h1 className='user-basic-info_name'>{user? user.name :'Имя'}</h1>
+                    <h1 className='user-basic-info_name'>{user.name ?? 'Имя'}</h1>
                 </div>
 
                 <div className='user-contact-info'>
@@ -81,7 +78,7 @@ export default function ProfileUserCard(){
                             className='user-contact-info_item--input' 
                             name='surname' 
                             type='text' 
-                            value={editUser? editUser.surname : 'Фамилия'}
+                            value={editUser.surname ?? 'Фамилия'}
                             onChange={editUserChangeOnClick}
                             onBlur={handlerUserChangeSave}
                         ></input>
@@ -94,7 +91,7 @@ export default function ProfileUserCard(){
                             className='user-contact-info_item--input' 
                             name='name' 
                             type='text' 
-                            value={editUser? editUser.name : 'Имя'}
+                            value={editUser.name ?? 'Имя'}
                             onChange={editUserChangeOnClick}
                             onBlur={handlerUserChangeSave}
                         ></input>
@@ -107,7 +104,7 @@ export default function ProfileUserCard(){
                             className='user-contact-info_item--input' 
                             name='patronymic' 
                             type='text' 
-                            value={editUser? editUser.patronymic : 'Отчество'}
+                            value={editUser.patronymic ?? 'Отчество'}
                             onChange={editUserChangeOnClick}
                             onBlur={handlerUserChangeSave}
                         ></input>
@@ -120,7 +117,7 @@ export default function ProfileUserCard(){
                             className='user-contact-info_item--input' 
                             name='mail' 
                             type='text' 
-                            value={editUser? editUser.mail : 'example@mail.com'}
+                            value={editUser.mail ?? 'example@mail.com'}
                             onChange={editUserChangeOnClick}
                             onBlur={handlerUserChangeSave}
                         ></input>
@@ -133,7 +130,7 @@ export default function ProfileUserCard(){
                             className='user-contact-info_item--input' 
                             name='numberPhone' 
                             type='text' 
-                            value={editUser? editUser.numberPhone : '+7(880)5553535'}
+                            value={editUser.numberPhone?? '+7(880)5553535'}
                             onChange={editUserChangeOnClick}
                             onBlur={handlerUserChangeSave}
                         ></input>
@@ -154,7 +151,7 @@ export default function ProfileUserCard(){
                                     name='role' 
                                     type='radio' 
                                     value='client'
-                                    checked={user!.role === 'client'}
+                                    checked={user.role === 'client'}
                                     onChange={editUserChangeOnClick}
                                     onClick={handlerUserChangeSave}
                                 ></input>
@@ -167,7 +164,7 @@ export default function ProfileUserCard(){
                                     name='role' 
                                     type='radio' 
                                     value='realtor'
-                                    checked={user!.role === 'realtor'}
+                                    checked={user.role === 'realtor'}
                                     onChange={editUserChangeOnClick}
                                     onClick={handlerUserChangeSave}
                                 ></input>

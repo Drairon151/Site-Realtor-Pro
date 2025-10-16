@@ -9,7 +9,7 @@ export default function Authorization(){
 
     const {
         user,
-        isLoading,
+        userLoading,
         userAuthorized,
     } = useUserContext()
     
@@ -17,7 +17,7 @@ export default function Authorization(){
     return(
         <div className="nav flex center">
             {
-                isLoading ?(
+                userLoading ?(
                     <p>Загрузка...</p>
                 ): userAuthorized ? (
                     <button 
