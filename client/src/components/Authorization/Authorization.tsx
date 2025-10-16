@@ -1,17 +1,18 @@
 import './Authorization.css'
 import '../../styles/forms.css'
 import { useNavigate } from 'react-router-dom';
-import useUser from '../../hooks/useUser';
+import { useUserContext } from '../../context/UserContext';
 
 
 export default function Authorization(){
   const navigate = useNavigate();
 
     const {
-        isLoading,
         user,
+        isLoading,
         userAuthorized,
-    } = useUser()
+    } = useUserContext()
+    
 
     return(
         <div className="nav flex center">

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import { useState, useEffect, FormEvent  } from "react";
-import useUser from "./useUser";
+import { useUserContext } from '../context/UserContext';
 import {User} from "../types/user"
 
 export default function useAuth(){
@@ -18,7 +18,7 @@ export default function useAuth(){
         setIsLoading,
         setCooldownTimer,
         setUserAuthorized,
-    } = useUser();
+    } = useUserContext();
 
     const [emailAuthStatus, setEmailAuthStatus] = useState<EmailAuthStatus>({
         status:'',

@@ -9,30 +9,34 @@ import LoginPage from './pages/AuthorizationPages/LoginPage/LoginPage';
 
 import PublicLayout from './layouts/PublicLayout';
 import AppLayout from './layouts/AppLayout';
+import { UserProvider } from './context/UserContext';
 
 function App() {
 
   return (
     <BrowserRouter>
-      <Header/>
-        <main>
-          
-      <Routes>
+      <UserProvider>
+        <Header/>
+          <main>
+            
+        <Routes>
 
-        <Route element={<PublicLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="/registration" element={<RegistrationPage />} />
-          <Route path="/login" element={<LoginPage />} />
-        </Route>
+          <Route element={<PublicLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="/registration" element={<RegistrationPage />} />
+            <Route path="/login" element={<LoginPage />} />
+          </Route>
 
-        <Route element={<AppLayout />}>
-          <Route path="/profile" element={<ProfilePage />} />
-          
-        </Route>
-      </Routes>
+          <Route element={<AppLayout />}>
 
-        </main> 
-      <Footer/>
+              <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+
+        </Routes>
+
+          </main> 
+        <Footer/>
+      </UserProvider>
     </BrowserRouter>
   )
 }

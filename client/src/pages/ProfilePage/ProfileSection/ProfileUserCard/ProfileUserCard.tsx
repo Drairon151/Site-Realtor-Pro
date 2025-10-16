@@ -3,9 +3,9 @@ import plug from '../../../../assets/img/icons/plug.png'
 import Modal from '../../../../components/Modal/Modal'
 import ChangePasswordForm from '../ProfileComponents/ChangePasswordForm/ChangePasswordForm'
 import { useEffect, useState } from 'react'
-import useUser from '../../../../hooks/useUser'
 import useAuth from '../../../../hooks/useAuth'
 
+import { useUserContext } from '../../../../context/UserContext'
 import { User } from '../../../../types/user'
 
 export default function ProfileUserCard(){    
@@ -13,7 +13,7 @@ export default function ProfileUserCard(){
         user,
         updateUserField,
         sendVerifyCodeChangePassword,
-    } = useUser()
+    } = useUserContext()
 
     const {
         logout,
@@ -31,6 +31,7 @@ export default function ProfileUserCard(){
 
         const allowedFields = ['name', 'surname', 'patronymic', '_id', 'role', 'mail', 'numberPhone'] as const;
         type StringField = typeof allowedFields[number];
+
 
         const isStringField = (key: string): key is StringField => {
             return allowedFields.includes(key as StringField);
@@ -52,7 +53,7 @@ export default function ProfileUserCard(){
         })
     }
 
-    function handlerUserChangeSave(event: React.FocusEvent<HTMLInputElement>){
+    function handlerUserChangeSave(event: React.FocusEvent<HTMLInputElement>|React.MouseEvent<HTMLInputElement>){
         const {name, value} = event.currentTarget;
         if(value.length != null && value.length != undefined){
             updateUserField(name, value)        
@@ -141,7 +142,6 @@ export default function ProfileUserCard(){
 
                     {
                         user!.role=='admin' ? (
-                            // Да сейчас тут заглушка
                             <p style={{color: 'white'}}>ВЫ АДМИН</p>
                         ):(
                             <div className='user-contact-info_item'>
