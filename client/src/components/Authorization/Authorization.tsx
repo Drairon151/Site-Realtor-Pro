@@ -2,16 +2,18 @@ import './Authorization.css'
 import '../../styles/forms.css'
 import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../../context/UserContext';
+import useUser from '../../hooks/useUser';
 
 
 export default function Authorization(){
   const navigate = useNavigate();
 
+    const {user} = useUserContext()
+
     const {
-        user,
         userLoading,
         userAuthorized,
-    } = useUserContext()
+    } = useUser()
     
 
     return(

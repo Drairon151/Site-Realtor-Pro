@@ -10,31 +10,46 @@ import LoginPage from './pages/AuthorizationPages/LoginPage/LoginPage';
 import PublicLayout from './layouts/PublicLayout';
 import AppLayout from './layouts/AppLayout';
 import { UserProvider } from './context/UserContext';
+import Header from './components/Header/Header';
+import Footer from './components/Footer/Footer';
+import RealtorLayout from './layouts/RealtorLayout';
+import ListingsNewPage from './pages/ListingsPage/ListingsNewPage/ListingsNewPage';
 
 function App() {
 
   return (
     <BrowserRouter>
       <UserProvider>
+        
+        <Header/>
 
-          <main>
-            
-        <Routes>
+        <main>  
+              
+          <Routes>
 
-          <Route element={<PublicLayout />}>
-            <Route index element={<HomePage />} />
-            <Route path="/registration" element={<RegistrationPage />} />
-            <Route path="/login" element={<LoginPage />} />
+            <Route element={<PublicLayout />}>
+              <Route index element={<HomePage />} />
+              <Route path="/registration" element={<RegistrationPage />} />
+              <Route path="/login" element={<LoginPage />} />
+            </Route>
+
+            <Route element={<AppLayout />}>
+                <Route path="/profile" element={<ProfilePage />} />
+
+                {/* <Route path="/listnigs" element={<ProfilePage />} /> */}
+
+            </Route>
+
+          <Route element={<RealtorLayout/>}>
+            <Route path="/listings/new" element={<ListingsNewPage/>} />
+            <Route path="/listnigs/my" element={<ProfilePage />} />
           </Route>
 
-          <Route element={<AppLayout />}>
+          </Routes>
 
-              <Route path="/profile" element={<ProfilePage />} />
-          </Route>
+        </main> 
 
-        </Routes>
-
-          </main> 
+        <Footer/>
 
       </UserProvider>
     </BrowserRouter>

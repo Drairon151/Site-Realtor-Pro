@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, FormEvent  } from "react";
 import { useUserContext } from '../context/UserContext';
 import {User} from "../types/user"
+import useUser from './useUser';
 
 export default function useAuth(){
     interface EmailAuthStatus{
@@ -13,13 +14,14 @@ export default function useAuth(){
     const {
         user,
         setUser,
+    } = useUserContext();
 
+    const {
         cooldownTimer,
         setIsLoading,
         setCooldownTimer,
         setUserAuthorized,
-    } = useUserContext();
-
+    } = useUser()
     const [emailAuthStatus, setEmailAuthStatus] = useState<EmailAuthStatus>({
         status:'',
         type:'',

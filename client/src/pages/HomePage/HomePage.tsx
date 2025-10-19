@@ -5,7 +5,7 @@ import HeroSection from './sections/HeroSection/HeroSection'
 export default function Home(){
     return(
         
-        <div className="Home-page">
+        <div className="home-page">
             <HeroSection/>
             <FeaturesSection/>
         </div>

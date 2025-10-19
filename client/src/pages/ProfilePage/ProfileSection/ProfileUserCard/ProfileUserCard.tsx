@@ -8,14 +8,14 @@ import useAuth from '../../../../hooks/useAuth'
 import { useUserContext } from '../../../../context/UserContext'
 import { User } from '../../../../types/user'
 
-export default function ProfileUserCard(){    
-    const {
-        user,
-        updateUserField,
-        sendVerifyCodeChangePassword,
-    } = useUserContext()
-
+interface ProfileUserCardProps{
+    user: User,
+    updateUserField: (name:string, value:string)=>void,
+    sendVerifyCodeChangePassword: ()=>void,
+    
+    logout: ()=>void,
 }
+
 
 export default function ProfileUserCard({user, updateUserField, sendVerifyCodeChangePassword, logout}:ProfileUserCardProps){    
 
@@ -26,9 +26,8 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
         setEditUser(user);
     }, [user]); 
 
-    function editUserChangeOnClick(event: React.ChangeEvent<HTMLInputElement>){
 
-    function editUserChangeOnClick(event: React.ChangeEvent<HTMLInputElement>|React.MouseEvent<HTMLInputElement>){
+    function editUserChange(event: React.ChangeEvent<HTMLInputElement>){
 
         const allowedFields = ['name', 'surname', 'patronymic', '_id', 'role', 'mail', 'numberPhone'] as const;
         type StringField = typeof allowedFields[number];
@@ -42,21 +41,33 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
         const {name, value} = event.currentTarget;
 
         setEditUser(prev=>{
-
-            return {
-                ...prev,
-                [inputData.name] : inputData.value,
+            const update = {...prev}
+            
+            if(isStringField(name)){
+                update[name] = value
             }
+            return update
         })
     }
 
-    function handlerUserChangeSave(event: React.FocusEvent<HTMLInputElement>|React.MouseEvent<HTMLInputElement>){
+
+    function handlerUserChangeSave(event: React.FocusEvent<HTMLInputElement>){
         const {name, value} = event.currentTarget;
         if(value.length != null){
             updateUserField(name, value)        
         }else{
             console.log('Данные пусты')
         }
+    }
+
+    function handleRadioChangeSave(event:React.MouseEvent<HTMLInputElement>){
+        const value = event.currentTarget.value;
+
+        setEditUser(prev=>({
+            ...prev,
+            ['role'] : value,
+        }))
+        updateUserField('role', value)      
     }
 
     return(
@@ -79,7 +90,7 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                             name='surname' 
                             type='text' 
                             value={editUser.surname ?? 'Фамилия'}
-                            onChange={editUserChangeOnClick}
+                            onChange={editUserChange}
                             onBlur={handlerUserChangeSave}
                         ></input>
                     </div>
@@ -92,7 +103,7 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                             name='name' 
                             type='text' 
                             value={editUser.name ?? 'Имя'}
-                            onChange={editUserChangeOnClick}
+                            onChange={editUserChange}
                             onBlur={handlerUserChangeSave}
                         ></input>
                     </div>
@@ -105,7 +116,7 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                             name='patronymic' 
                             type='text' 
                             value={editUser.patronymic ?? 'Отчество'}
-                            onChange={editUserChangeOnClick}
+                            onChange={editUserChange}
                             onBlur={handlerUserChangeSave}
                         ></input>
                     </div>
@@ -118,7 +129,7 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                             name='mail' 
                             type='text' 
                             value={editUser.mail ?? 'example@mail.com'}
-                            onChange={editUserChangeOnClick}
+                            onChange={editUserChange}
                             onBlur={handlerUserChangeSave}
                         ></input>
                     </div>
@@ -131,7 +142,7 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                             name='numberPhone' 
                             type='text' 
                             value={editUser.numberPhone?? '+7(880)5553535'}
-                            onChange={editUserChangeOnClick}
+                            onChange={editUserChange}
                             onBlur={handlerUserChangeSave}
                         ></input>
                     </div>
@@ -151,9 +162,8 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                                     name='role' 
                                     type='radio' 
                                     value='client'
-                                    checked={user.role === 'client'}
-                                    onChange={editUserChangeOnClick}
-                                    onClick={handlerUserChangeSave}
+                                    checked={editUser.role === 'client'}
+                                    onClick={handleRadioChangeSave}
                                 ></input>
 
                                 <label className='user-contact-info_item--lable' htmlFor='role'>
@@ -164,9 +174,8 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                                     name='role' 
                                     type='radio' 
                                     value='realtor'
-                                    checked={user.role === 'realtor'}
-                                    onChange={editUserChangeOnClick}
-                                    onClick={handlerUserChangeSave}
+                                    checked={editUser.role === 'realtor'}
+                                    onClick={handleRadioChangeSave}
                                 ></input>
                             </div>
                         )

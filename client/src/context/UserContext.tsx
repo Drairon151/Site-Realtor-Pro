@@ -6,15 +6,20 @@ interface UserProviderProps{
     children: React.ReactNode
 }
 
-type UserContextType = ReturnType<typeof useUser>
+export interface UserContextValue {
+    user: User | null;
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
+    userLoading: boolean,
+    userAuthorized: boolean,
+}
 
-const UserContext = createContext<UserContextType|undefined>(undefined);
+const UserContext = createContext<UserContextValue|undefined>(undefined);
 
 export const UserProvider = ({children}:UserProviderProps)=>{
-    const userState = useUser()
+    const {user, userLoading, userAuthorized, setUser} = useUser()
 
     return(
-        <UserContext.Provider value={userState}>
+        <UserContext.Provider value={{user, userLoading, userAuthorized, setUser}}>
             {children}
         </UserContext.Provider>
     )

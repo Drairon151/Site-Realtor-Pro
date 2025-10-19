@@ -5,13 +5,14 @@ import './ProfileSection.css'
 
 import useUser from '../../../hooks/useUser'
 import useAuth from '../../../hooks/useAuth'
+import { useUserContext } from "../../../context/UserContext";
 
 
 export default function Profile(){
 
+    const{user} = useUserContext()
 
     const {
-        user,
         updateUserField,
         sendVerifyCodeChangePassword,
     } = useUser()

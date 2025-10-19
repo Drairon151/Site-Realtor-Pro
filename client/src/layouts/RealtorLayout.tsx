@@ -4,9 +4,9 @@ import './AppLayout.css'
 
 import { useUserContext } from '../context/UserContext';
 
-export default function AppLayout() {
+export default function RealtorLayout() {
     const { 
-        userAuthorized, 
+        user,
         userLoading,
     } = useUserContext();
 
@@ -14,8 +14,12 @@ export default function AppLayout() {
     return <div className="loading">Загрузка...</div>;
   }
 
-  if (!userAuthorized) {
+  if (!user) {
     return <Navigate to="/" replace />;
+  }
+
+  if (user.role !== 'realtor') {
+    return <Navigate to="/profile" replace />;
   }
 
   return (
