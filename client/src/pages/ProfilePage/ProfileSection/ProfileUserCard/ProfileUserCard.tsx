@@ -3,9 +3,7 @@ import plug from '../../../../assets/img/icons/plug.png'
 import Modal from '../../../../components/Modal/Modal'
 import ChangePasswordForm from '../ProfileComponents/ChangePasswordForm/ChangePasswordForm'
 import { useEffect, useState } from 'react'
-import useAuth from '../../../../hooks/useAuth'
 
-import { useUserContext } from '../../../../context/UserContext'
 import { User } from '../../../../types/user'
 
 interface ProfileUserCardProps{
