@@ -6,6 +6,7 @@ export default function CreateListingForm(){
         selectedFiles,
 
         createListing,
+        photoChangeHandler,
     } = useListings()
     
     return (
@@ -80,8 +81,7 @@ export default function CreateListingForm(){
                     accept="image/*,.png,.jpg"
                     multiple
 
-                    value={selectedFiles}
-                    onChange={}
+                    onChange={photoChangeHandler}
                 />
             </div>
 

@@ -1,4 +1,6 @@
 import { useState, useEffect} from "react";
+import photoValidator from "../utils/photoValidator";
+import { photoErrorStatusInterface } from "../types/photoErrorStatusInterface";
 
 export default function useListings(){
     const [
@@ -9,7 +11,7 @@ export default function useListings(){
     const [
         imageFileError,
         setImageFileError
-    ] = useState('not-error')
+    ] = useState<photoErrorStatusInterface[] | null>(null)
 
     const [
         
@@ -26,20 +28,17 @@ export default function useListings(){
 
         const formData = new FormData(event.currentTarget);
         const files = formData.getAll('photos')  as File[];;
-        const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png'];
-        const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
 
         console.log('Файлы типа', files)
 
-        const validFiles = files.map(file => {
+        let validateResult = photoValidator(files)
 
-            if(!ALLOWED_IMAGE_TYPES.includes(file.type)){
-                setImageFileError('invalid file type')    
-            }else if (file.size > MAX_FILE_SIZE){
-                setImageFileError('invalid file size')
-            }
-            
-        });
+        
+
+        setSelectedFiles(validateResult.validFiles)
+        setImageFileError(validateResult.photoErrorStatus)
+        
 
         const listingData = {
             title: formData.get('title'),
@@ -48,15 +47,30 @@ export default function useListings(){
             sity: formData.get('sity'),
             specs: formData.get('specs'),
             description: formData.get('description'),
-            photos: formData.get('photos'),
+            photos: files,
         }
 
     }
+    
+    // const imageUrl = URL.createObjectURL(file);
 
+    const photoChangeHandler = (event: React.ChangeEvent<HTMLInputElement>)=>{
+        const files  = event.currentTarget.files ;
+
+        let validateResult = photoValidator(files)
+
+        
+
+        setSelectedFiles(validateResult.validFiles)
+        setImageFileError(validateResult.photoErrorStatus)
+    }
+    
     return{
         listingOnLoading,
         selectedFiles,
+        imageFileError,
         
         createListing,
+        photoChangeHandler,
     }
 }
