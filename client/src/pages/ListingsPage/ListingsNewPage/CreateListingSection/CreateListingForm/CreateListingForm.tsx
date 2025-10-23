@@ -8,14 +8,10 @@ export default function CreateListingForm(){
 
         createListing,
         photoChangeHandler,
+        photoDeleteHandler,
+
     } = useListings()
     
-    const [photoURLs, setPhotoURLs] = useState<string[]|null>([])
-
-
-    useEffect(()=>{
-        setPhotoURLs(selectedFiles.map(file=>URL.createObjectURL(file)))
-    },[selectedFiles])
 
     return (
         <form className="create-listing-form form" onSubmit={createListing}>
@@ -94,13 +90,13 @@ export default function CreateListingForm(){
             </div>
             <div className="user-photos">
                 {
-                !photoURLs ? null 
-                    : photoURLs.map(photoURL=>(
+                !selectedFiles ? null 
+                    : selectedFiles.map(fileData=>
                     <div className="user-photos_item flex">
-                        <button className="user-photos_button">❌</button>
-                        <img className="user-photos_img" src={photoURL} alt=""/>
+                        <button className="user-photos_button" onClick={()=>photoDeleteHandler(fileData)}>❌</button>
+                        <img className="user-photos_img" src={fileData.fileURL} alt=""/>
                     </div>
-                ))
+                )
                 }
             </div>
 

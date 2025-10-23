@@ -1,7 +1,8 @@
 import { photoErrorStatusInterface } from "../types/photoErrorStatusInterface";
+import {fileData} from "../types/fileData"
 
 interface photoValidatorResult{
-    validFiles: File[],
+    validFiles: {file:File, fileURL:string }[],
     photoErrorStatus: photoErrorStatusInterface[],
 }
 
@@ -13,28 +14,31 @@ export default function photoValidator(files:FileList):photoValidatorResult{
 
     let photoErrorStatus: photoErrorStatusInterface[] = [];
 
-    let validFiles:File[] = []
+    let validFiles:fileData[] = []
 
-    filesArr.forEach(file => {
+    filesArr.forEach(fileData => {
 
-        if(!ALLOWED_IMAGE_TYPES.includes(file.type)){
+        if(!ALLOWED_IMAGE_TYPES.includes(fileData.type)){
             photoErrorStatus.push({
-                fileName: file.name, 
+                fileName: fileData.name, 
                 errorType:'invalid file type'
             })
-        }else if (file.size > MAX_FILE_SIZE){
+        }else if (fileData.size > MAX_FILE_SIZE){
             photoErrorStatus.push({
-                fileName: file.name, 
+                fileName: fileData.name, 
                 errorType:'invalid file size'
             })
         }else{
-            validFiles.push(file);
+            
+            validFiles.push({file:fileData, fileURL: URL.createObjectURL(fileData)});
         }
     });
+
 
     return {
         
         validFiles,
+
         photoErrorStatus,
     }
 

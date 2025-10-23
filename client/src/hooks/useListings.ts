@@ -1,6 +1,7 @@
 import { useState, useEffect} from "react";
 import photoValidator from "../utils/photoValidator";
 import { photoErrorStatusInterface } from "../types/photoErrorStatusInterface";
+import {fileData} from "../types/fileData"
 
 export default function useListings(){
     const [
@@ -18,7 +19,7 @@ export default function useListings(){
         selectedFiles, 
         setSelectedFiles
 
-    ] = useState<{files: File[], filesURL:string}[]>([]);
+    ] = useState<fileData[]>([]);
 
     
 
@@ -35,7 +36,7 @@ export default function useListings(){
             sity: formData.get('sity'),
             specs: formData.get('specs'),
             description: formData.get('description'),
-            photos: selectedFiles.files,
+            photos: selectedFiles.map(item=>item.file),
         }
 
     }
@@ -53,10 +54,20 @@ export default function useListings(){
 
         
 
-        setSelectedFiles(prev=>{
-            return{...prev,files:validateResult.validFiles}
-        })
+        setSelectedFiles(validateResult.validFiles)
         setImageFileError(validateResult.photoErrorStatus)
+    }
+
+    const photoDeleteHandler = (choicedFile:fileData)=>{
+        let result:fileData[] = []
+        
+        selectedFiles.forEach(fileData=>{
+            if(fileData.fileURL !== choicedFile.fileURL){
+                result.push(fileData)
+            }
+        })
+
+        setSelectedFiles(result)
     }
 
     return{
@@ -66,5 +77,6 @@ export default function useListings(){
         
         createListing,
         photoChangeHandler,
+        photoDeleteHandler,
     }
 }
