@@ -1,20 +1,18 @@
 import { photoErrorStatusInterface } from "../types/photoErrorStatusInterface";
-import {fileData} from "../types/fileData"
-
 interface photoValidatorResult{
-    validFiles: {file:File, fileURL:string }[],
+    validFiles: File[],
     photoErrorStatus: photoErrorStatusInterface[],
 }
 
 export default function photoValidator(files:FileList):photoValidatorResult{
     const filesArr = Array.from(files);
 
-    const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png'];
+    const ALLOWED_IMAGE_TYPES = ['image/jpeg','image/webp', 'image/png'];
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
     let photoErrorStatus: photoErrorStatusInterface[] = [];
 
-    let validFiles:fileData[] = []
+    let validFiles:File[] = []
 
     filesArr.forEach(fileData => {
 
@@ -29,8 +27,7 @@ export default function photoValidator(files:FileList):photoValidatorResult{
                 errorType:'invalid file size'
             })
         }else{
-            
-            validFiles.push({file:fileData, fileURL: URL.createObjectURL(fileData)});
+            validFiles.push(fileData);
         }
     });
 

@@ -1,5 +1,6 @@
-import useListings from "../../../../../hooks/useListings"
+import useListings from "../../../../../hooks/useListingForm"
 import { useEffect,useState } from "react"
+
 import "./CreateListingForm.css"
 
 export default function CreateListingForm(){
@@ -33,11 +34,11 @@ export default function CreateListingForm(){
 
             />
             
-            <label className="create-listing-form_lable" htmlFor="listing-input-adress">Адрес</label>
+            <label className="create-listing-form_lable" htmlFor="listing-input-address">Адрес</label>
             <input
                 className="create-listing-form_input"
-                id="listing-input-adress"
-                name="adress"
+                id="listing-input-address"
+                name="address"
                 type="text"
 
             />
@@ -82,17 +83,17 @@ export default function CreateListingForm(){
                     id="listing-input-photos"
                     name="photos"
                     type="file"
-                    accept="image/*,.png,.jpg"
+                    accept="image/*,.png,.jpg,.webp"
                     multiple
 
                     onChange={photoChangeHandler}
                 />
             </div>
-            <div className="user-photos">
+            <div className="user-photos flex">
                 {
                 !selectedFiles ? null 
                     : selectedFiles.map(fileData=>
-                    <div className="user-photos_item flex">
+                    <div className="user-photos_item">
                         <button className="user-photos_button" onClick={()=>photoDeleteHandler(fileData)}>❌</button>
                         <img className="user-photos_img" src={fileData.fileURL} alt=""/>
                     </div>

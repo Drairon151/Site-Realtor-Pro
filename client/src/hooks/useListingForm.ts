@@ -27,18 +27,28 @@ export default function useListings(){
         event.preventDefault()
         setListingOnLoading(true)
 
-        const formData = new FormData(event.currentTarget);
+        try{
+            const formData = new FormData(event.currentTarget);
 
-        const listingData = {
-            title: formData.get('title'),
-            price: formData.get('price'),
-            adress: formData.get('adress'),
-            sity: formData.get('sity'),
-            specs: formData.get('specs'),
-            description: formData.get('description'),
-            photos: selectedFiles.map(item=>item.file),
+            const listingData = {
+                title: formData.get('title'),
+                price: formData.get('price'),
+                adress: formData.get('address'),
+                sity: formData.get('city'),
+                specs: formData.get('specs'),
+                description: formData.get('description'),
+                photos: selectedFiles.map(item=>item.file),
+            }
+
+        }catch(error){
+            
         }
+    }
 
+    const inputValidator = (event: React.ChangeEvent<HTMLInputElement>)=>{
+        const inputData = event.currentTarget;
+        if(!inputData){}
+            // Сделать простую валидавцию которая привязывается к каждому компоненту
     }
     
 
@@ -52,10 +62,24 @@ export default function useListings(){
 
         const validateResult = photoValidator(files)
 
-        
 
-        setSelectedFiles(validateResult.validFiles)
-        setImageFileError(validateResult.photoErrorStatus)
+        setSelectedFiles(prev=>{
+            const newFiles = validateResult.validFiles.map(fileData=>{
+                return {file: fileData, fileURL: URL.createObjectURL(fileData)}
+            })
+
+            return[...prev, ...newFiles]            
+        })
+
+        setImageFileError(prev=>{
+            if(!prev){
+                return[...validateResult.photoErrorStatus]
+            }else{
+                return[...prev, ...validateResult.photoErrorStatus]
+            }
+            }
+        )
+
     }
 
     const photoDeleteHandler = (choicedFile:fileData)=>{
@@ -64,6 +88,8 @@ export default function useListings(){
         selectedFiles.forEach(fileData=>{
             if(fileData.fileURL !== choicedFile.fileURL){
                 result.push(fileData)
+            }else{
+                URL.revokeObjectURL(fileData.fileURL)
             }
         })
 
