@@ -5,34 +5,37 @@ interface photoValidatorResult{
     photoErrorStatus: photoErrorStatusInterface[],
 }
 
-export default function photoValidator(files:File[]):photoValidatorResult{
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png'];
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+export default function photoValidator(files:FileList):photoValidatorResult{
+    const filesArr = Array.from(files);
 
-let photoErrorStatus: photoErrorStatusInterface[] = [];
+    const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png'];
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-let validFiles:File[] = []
+    let photoErrorStatus: photoErrorStatusInterface[] = [];
 
-files.forEach(file => {
+    let validFiles:File[] = []
 
-    if(!ALLOWED_IMAGE_TYPES.includes(file.type)){
-        photoErrorStatus.push({
-            fileName: file.name, 
-            errorType:'invalid file type'
-        })
-    }else if (file.size > MAX_FILE_SIZE){
-        photoErrorStatus.push({
-            fileName: file.name, 
-            errorType:'invalid file size'
-        })
-    }else{
-        validFiles.push(file);
+    filesArr.forEach(file => {
+
+        if(!ALLOWED_IMAGE_TYPES.includes(file.type)){
+            photoErrorStatus.push({
+                fileName: file.name, 
+                errorType:'invalid file type'
+            })
+        }else if (file.size > MAX_FILE_SIZE){
+            photoErrorStatus.push({
+                fileName: file.name, 
+                errorType:'invalid file size'
+            })
+        }else{
+            validFiles.push(file);
+        }
+    });
+
+    return {
+        
+        validFiles,
+        photoErrorStatus,
     }
-});
-
-return {
-    validFiles,
-    photoErrorStatus,
-}
 
 }

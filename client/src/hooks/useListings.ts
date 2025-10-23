@@ -18,27 +18,15 @@ export default function useListings(){
         selectedFiles, 
         setSelectedFiles
 
-    ] = useState<File[]>([]);
+    ] = useState<{files: File[], filesURL:string}[]>([]);
+
+    
 
     const createListing = async (event: React.FormEvent<HTMLFormElement>) => {
-
-
         event.preventDefault()
         setListingOnLoading(true)
 
         const formData = new FormData(event.currentTarget);
-        const files = formData.getAll('photos')  as File[];;
-
-
-        console.log('Файлы типа', files)
-
-        let validateResult = photoValidator(files)
-
-        
-
-        setSelectedFiles(validateResult.validFiles)
-        setImageFileError(validateResult.photoErrorStatus)
-        
 
         const listingData = {
             title: formData.get('title'),
@@ -47,24 +35,30 @@ export default function useListings(){
             sity: formData.get('sity'),
             specs: formData.get('specs'),
             description: formData.get('description'),
-            photos: files,
+            photos: selectedFiles.files,
         }
 
     }
     
-    // const imageUrl = URL.createObjectURL(file);
 
     const photoChangeHandler = (event: React.ChangeEvent<HTMLInputElement>)=>{
-        const files  = event.currentTarget.files ;
+        const files  = (event.currentTarget.files) ;
 
-        let validateResult = photoValidator(files)
+        if(!files){
+            return 0
+        }
+
+
+        const validateResult = photoValidator(files)
 
         
 
-        setSelectedFiles(validateResult.validFiles)
+        setSelectedFiles(prev=>{
+            return{...prev,files:validateResult.validFiles}
+        })
         setImageFileError(validateResult.photoErrorStatus)
     }
-    
+
     return{
         listingOnLoading,
         selectedFiles,

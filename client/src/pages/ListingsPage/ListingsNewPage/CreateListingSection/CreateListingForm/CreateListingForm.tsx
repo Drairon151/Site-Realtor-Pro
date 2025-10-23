@@ -1,4 +1,5 @@
 import useListings from "../../../../../hooks/useListings"
+import { useEffect,useState } from "react"
 import "./CreateListingForm.css"
 
 export default function CreateListingForm(){
@@ -9,6 +10,13 @@ export default function CreateListingForm(){
         photoChangeHandler,
     } = useListings()
     
+    const [photoURLs, setPhotoURLs] = useState<string[]|null>([])
+
+
+    useEffect(()=>{
+        setPhotoURLs(selectedFiles.map(file=>URL.createObjectURL(file)))
+    },[selectedFiles])
+
     return (
         <form className="create-listing-form form" onSubmit={createListing}>
             <label className="create-listing-form_lable" htmlFor="listing-input-title">Название обьявления</label>
@@ -83,6 +91,17 @@ export default function CreateListingForm(){
 
                     onChange={photoChangeHandler}
                 />
+            </div>
+            <div className="user-photos">
+                {
+                !photoURLs ? null 
+                    : photoURLs.map(photoURL=>(
+                    <div className="user-photos_item flex">
+                        <button className="user-photos_button">❌</button>
+                        <img className="user-photos_img" src={photoURL} alt=""/>
+                    </div>
+                ))
+                }
             </div>
 
             <button type="submit" className="create-listing-form_button form_button">Отправить</button>
