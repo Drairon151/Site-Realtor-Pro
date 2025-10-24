@@ -21,8 +21,6 @@ export default function useListings(){
 
     ] = useState<fileData[]>([]);
 
-    
-
     const createListing = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         setListingOnLoading(true)
@@ -47,13 +45,16 @@ export default function useListings(){
 
     const inputValidator = (event: React.ChangeEvent<HTMLInputElement>)=>{
         const inputData = event.currentTarget;
-        if(!inputData){}
-            // Сделать простую валидавцию которая привязывается к каждому компоненту
+        if(!inputData){
+            
+        }
+                
     }
     
 
     const photoChangeHandler = (event: React.ChangeEvent<HTMLInputElement>)=>{
         const files  = (event.currentTarget.files) ;
+        setImageFileError(null)
 
         if(!files){
             return 0
@@ -84,6 +85,7 @@ export default function useListings(){
 
     const photoDeleteHandler = (choicedFile:fileData)=>{
         let result:fileData[] = []
+        setImageFileError(null)
         
         selectedFiles.forEach(fileData=>{
             if(fileData.fileURL !== choicedFile.fileURL){
@@ -95,6 +97,7 @@ export default function useListings(){
 
         setSelectedFiles(result)
     }
+
 
     return{
         listingOnLoading,

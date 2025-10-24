@@ -6,6 +6,7 @@ import "./CreateListingForm.css"
 export default function CreateListingForm(){
     const {
         selectedFiles,
+        imageFileError,
 
         createListing,
         photoChangeHandler,
@@ -89,6 +90,20 @@ export default function CreateListingForm(){
                     onChange={photoChangeHandler}
                 />
             </div>
+
+            {!imageFileError ? null: 
+            
+            <div className="photos-error">
+                <p>Произошла ошибка загрузки данных файлов:</p>
+                {imageFileError.map(fileError=>{
+                    return <p className="photos-error-message">
+                        {`Имя файла: ${fileError.fileName}, ошибка:${fileError.errorType}\n`}
+                        </p>
+                })}
+            </div>
+
+            }
+
             <div className="user-photos flex">
                 {
                 !selectedFiles ? null 

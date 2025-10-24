@@ -41,6 +41,17 @@
     z-index: -1;
 }
 
+.photos-error-message{
+    color: red;
+    font-size: 10px;
+}
+
+.user-photos{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+}
+
 .user-photos_item{
     /* position: relative; */
 
