@@ -1,47 +1,69 @@
-import useListings from "../../../../../hooks/useListingForm"
 import { useEffect,useState } from "react"
+
+import useListingForm from "../../../../../hooks/useListingForm"
+import useListingFormField from "../../../../../hooks/useListingFormField"
+import useListingFormPhoto from "../../../../../hooks/useListingFormPhoto"
 
 import "./CreateListingForm.css"
 
 export default function CreateListingForm(){
     const {
-        selectedFiles,
-        imageFileError,
+        listingOnError,
 
         createListing,
+    } = useListingForm()
+
+    const {
+        selectedFiles,
+        imageFileError,
+        
         photoChangeHandler,
         photoDeleteHandler,
-
-    } = useListings()
+    } = useListingFormPhoto()
     
+    const {
+        listingFormData,
+        formatPrice,
+
+        listingInputValidator,
+    } = useListingFormField()
 
     return (
-        <form className="create-listing-form form" onSubmit={createListing}>
+        <form className="create-listing-form form" onSubmit={event=>createListing(event,listingFormData,selectedFiles)}>
             <label className="create-listing-form_lable" htmlFor="listing-input-title">Название обьявления</label>
             <input
                 className="create-listing-form_input"
                 id="listing-input-title"
                 name="title" 
-                type="text" 
-
+                type="text"
+                value={listingFormData.title}
+                onChange={listingInputValidator}
+                placeholder="Большой дом в селе Шишкино"
             />
 
             <label className="create-listing-form_lable" htmlFor="listing-input-price">Цена</label>
-            <input
-                className="create-listing-form_input"
-                id="listing-input-price"
-                name="price"
-                type="number"
-
-            />
             
+            <div>
+                <input
+                    className="create-listing-form_input create-listing-form_input-price"
+                    id="listing-input-price"
+                    name="price"
+                    type="text"
+                    value={`${formatPrice}`}
+                    onChange={listingInputValidator}
+                    placeholder="10 000 000"
+                />
+                <span className="create-listing-form_currency">₽</span>
+            </div>
             <label className="create-listing-form_lable" htmlFor="listing-input-address">Адрес</label>
             <input
                 className="create-listing-form_input"
                 id="listing-input-address"
                 name="address"
                 type="text"
-
+                value={listingFormData.address}
+                onChange={listingInputValidator}
+                placeholder="Г. Смоленск С. Шишкино Ул. Капиталистическая Д. 123"
             />
 
             <label className="create-listing-form_lable" htmlFor="listing-input-city">Город</label>
@@ -50,7 +72,9 @@ export default function CreateListingForm(){
                 id="listing-input-city"
                 name="city"
                 type="text"
-
+                value={listingFormData.city}
+                onChange={listingInputValidator}
+                placeholder="Смоленск"
             />
             
             <label className="create-listing-form_lable" htmlFor="listing-input-specs">Характеристики дома</label>
@@ -59,7 +83,9 @@ export default function CreateListingForm(){
                 id="listing-input-specs"
                 name="specs"
                 type="text"
-
+                value={listingFormData.specs}
+                onChange={listingInputValidator}
+                placeholder="2-этаж 2-ком 22м² 10сот "
             />
 
             <label className="create-listing-form_lable" htmlFor="listing-input-description">Описание обьявления</label>
@@ -67,8 +93,11 @@ export default function CreateListingForm(){
                 className="create-listing-form_textarea"
                 id="listing-input-description"
                 name="description"
+                value={listingFormData.description}
+                onChange={listingInputValidator}
                 maxLength={5000}
                 rows={6}
+                placeholder="Уютный двухэтажный дом с двумя комнатами и прекрасным видом на озеро 'Болото'. Возможен небольшой торг. Качество материалов как и ремонта - Советское."
             />
 
             <div>
@@ -117,6 +146,12 @@ export default function CreateListingForm(){
             </div>
 
             <button type="submit" className="create-listing-form_button form_button">Отправить</button>
+
+            {!listingOnError ? null:
+                <p className="create-listing-form--error">
+                    {listingOnError}
+                </p>
+            }
 
         </form>
     )
