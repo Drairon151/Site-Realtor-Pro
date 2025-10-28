@@ -1,20 +1,22 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar/Sidebar';
 import './AppLayout.css'
 
 import { useUserContext } from '../context/UserContext';
 
 export default function AppLayout() {
-    const { 
-        userAuthorized, 
-        userLoading,
-    } = useUserContext();
+  const { 
+      userAuthorized, 
+      userLoading,
+  } = useUserContext();
+
+  const { listingId } = useParams<{ listingId: string }>();
 
   if (userLoading) {
     return <div className="loading">Загрузка...</div>;
   }
 
-  if (!userAuthorized) {
+  if (userAuthorized == false) {
     return <Navigate to="/" replace />;
   }
 

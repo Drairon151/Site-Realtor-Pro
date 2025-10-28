@@ -1,5 +1,3 @@
-import { useEffect,useState } from "react"
-
 import useListingForm from "../../../../../hooks/useListingForm"
 import useListingFormField from "../../../../../hooks/useListingFormField"
 import useListingFormPhoto from "../../../../../hooks/useListingFormPhoto"

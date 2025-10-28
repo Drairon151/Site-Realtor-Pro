@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext } from "react";
 import useUser from "../hooks/useUser";
 import { User } from "../types/user";
 
@@ -10,7 +10,7 @@ export interface UserContextValue {
     user: User | null;
     setUser: React.Dispatch<React.SetStateAction<User | null>>;
     userLoading: boolean,
-    userAuthorized: boolean,
+    userAuthorized: boolean | null,
 }
 
 const UserContext = createContext<UserContextValue|undefined>(undefined);

@@ -24,7 +24,7 @@ export default function Sidebar(){
 
     if(user.role == 'realtor'){
         menuItems.push(
-            { label: 'Создать обьявление', path: '/listings/new' },
+            { label: 'Создать обьявление', path: '/listing/new' },
             { label: 'Мои объявления', path: '/listings/my' },
             { label: 'Мои отзывы', path: '/reviews' },
         );

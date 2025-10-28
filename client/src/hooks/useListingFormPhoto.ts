@@ -64,6 +64,19 @@ export default function usePhotoUploader(){
         setSelectedFiles(result)
     }
 
+    const fileToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+        });
+    };
+
+    const photosBase64 = await Promise.all(
+        selectedFiles.map(f => fileToBase64(f.file))
+    );
+
     return{
         selectedFiles,
         imageFileError,

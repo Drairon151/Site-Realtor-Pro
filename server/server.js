@@ -10,6 +10,7 @@ const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes'); // ✅ Здесь!
 const userRoutes = require('./routes/userRoutes')
 const listingRoutes = require('./routes/listingRoutes');
+const listingsRoutes = require('./routes/listingsRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,7 +25,10 @@ app.use(cookieParser()); // ← парсинг кук
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', authMiddleware, userRoutes);
+
 app.use('/api/listing', authMiddleware, listingRoutes); // ← все маршруты будут /api/listing, /api/listings
+app.use('/api/listings', authMiddleware, listingsRoutes); // ← все маршруты будут /api/listing, /api/listings
+
 app.use('/api', profileRoutes);
 app.get('/', (req, res) => {
   res.send('🚀 Сервер Риелтор-Профи запущен!');

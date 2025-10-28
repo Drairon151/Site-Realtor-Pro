@@ -30,7 +30,7 @@ export default function useUser(){
 
     const API_USER: string = 'http://localhost:5000/api/user';
     const [cooldownTimer, setCooldownTimer] = useState<number>(0);
-    const [userAuthorized, setUserAuthorized] = useState<boolean>(false)
+    const [userAuthorized, setUserAuthorized] = useState<boolean | null>(false)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [userLoading, setUserLoading] = useState<boolean>(false);
     

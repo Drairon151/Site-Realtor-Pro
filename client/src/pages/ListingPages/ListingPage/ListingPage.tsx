@@ -1,4 +1,4 @@
-export default function ListingsPage(){
+export default function ListingPage(){
 
     return(
         <div className="listings-page">

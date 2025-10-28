@@ -13,7 +13,9 @@ import { UserProvider } from './context/UserContext';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import RealtorLayout from './layouts/RealtorLayout';
-import ListingsNewPage from './pages/ListingsPage/ListingsNewPage/ListingsNewPage';
+import ListingNewPage from './pages/ListingPages/ListingNewPage/ListingNewPage';
+import ListingPage from './pages/ListingPages/ListingPage/ListingPage';
+import ListingsMyPage from './pages/ListingsPages/ListingsMyPage/ListingsMyPages';
 
 function App() {
 
@@ -34,15 +36,15 @@ function App() {
             </Route>
 
             <Route element={<AppLayout />}>
-                <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
 
-                {/* <Route path="/listnigs" element={<ProfilePage />} /> */}
+              <Route path="/listing/:listingId" element={<ListingPage/>} />
 
             </Route>
 
           <Route element={<RealtorLayout/>}>
-            <Route path="/listings/new" element={<ListingsNewPage/>} />
-            <Route path="/listnigs/my" element={<ProfilePage />} />
+            <Route path="/listing/new" element={<ListingNewPage/>} />
+            <Route path="/listings/my" element={<ListingsMyPage/>} />
           </Route>
 
           </Routes>
