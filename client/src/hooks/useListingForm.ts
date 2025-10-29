@@ -21,15 +21,20 @@ export default function useListingForm(){
     
     const navigate = useNavigate();
 
+    
+
     const createListing = async (
         event: React.FormEvent<HTMLFormElement>, 
         listingFormData: listingFormDataInterface,
-        selectedFiles: fileData[], 
+        selectedFiles: fileData[],
+        photosBase64: (files: fileData[]) => Promise<string[]>
     ) => {
         
         
         event.preventDefault()
         setListingOnLoading(true)
+        const Base64photos = await photosBase64(selectedFiles)
+
 
         try{
             const listingData = {
@@ -39,7 +44,7 @@ export default function useListingForm(){
                 city: listingFormData.city,
                 specs: listingFormData.specs,
                 description: listingFormData.description,
-                photos: selectedFiles,    
+                photos: Base64photos,
             }
 
             for (let inputValue of Object.values(listingFormData)){

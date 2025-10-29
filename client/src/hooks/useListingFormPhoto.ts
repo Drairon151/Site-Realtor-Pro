@@ -64,18 +64,34 @@ export default function usePhotoUploader(){
         setSelectedFiles(result)
     }
 
-    const fileToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
+
+
+
+
+    const fileToBase64 = (file:File): Promise<string> => {
+        return new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]);
+
+            reader.onload = () => {
+
+                if(typeof reader.result == 'string'){
+                    resolve(reader.result.split(',')[1])
+                }else{
+                    reject(new Error('Incorrect data'))
+                }
+
+            };
             reader.onerror = reject;
         });
     };
 
-    const photosBase64 = await Promise.all(
-        selectedFiles.map(f => fileToBase64(f.file))
-    );
+    const photosBase64 = async (files: fileData[]): Promise<string[]> => {
+        const results = await Promise.allSettled(files.map(files=>fileToBase64(files.file)));
+        return results
+            .filter((res): res is PromiseFulfilledResult<string> => res.status === 'fulfilled')
+            .map(res => res.value);
+    };
 
     return{
         selectedFiles,
@@ -83,6 +99,8 @@ export default function usePhotoUploader(){
         
         photoChangeHandler,
         photoDeleteHandler,
+
+        photosBase64,
     }
     
 }

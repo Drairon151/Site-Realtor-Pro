@@ -20,7 +20,7 @@ app.use(cors({
   origin: 'http://localhost:5173', // твой фронтенд
   credentials: true, // ← важно для кук
 }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); 
 app.use(cookieParser()); // ← парсинг кук
 
 app.use('/api/auth', authRoutes);
