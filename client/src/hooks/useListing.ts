@@ -30,6 +30,7 @@ export default function useListing() {
             }
             
             const result = await response.json();
+            console.log('Данные обьявления получены! ', result)
             setListing(result.listing);
 
 

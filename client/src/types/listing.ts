@@ -5,5 +5,5 @@ export interface Listing{
     city: string
     specs: string
     description: string
-    photosUrls: string[],
+    images: string[],
 }
