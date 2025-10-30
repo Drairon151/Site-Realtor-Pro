@@ -30,13 +30,14 @@ export default function useUser(){
 
     const API_USER: string = 'http://localhost:5000/api/user';
     const [cooldownTimer, setCooldownTimer] = useState<number>(0);
-    const [userAuthorized, setUserAuthorized] = useState<boolean | null>(false)
+    const [userAuthorized, setUserAuthorized] = useState<boolean | null>(null)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [userLoading, setUserLoading] = useState<boolean>(false);
     
     useEffect(()=>{
         const checkAuth = async () => {
             setUserLoading(true)
+            setUserAuthorized(null)
 
             console.log('Проверка авторизации')
             try {
@@ -65,10 +66,11 @@ export default function useUser(){
             }catch(error){
                 if (error instanceof Error) {
                     console.log(error.message);
-                    setUserAuthorized(false)
                 } else {
                     console.log('Ошибка:', error);
                 }
+                setUserAuthorized(false)
+
             }finally{
                 setUserLoading(false)
 

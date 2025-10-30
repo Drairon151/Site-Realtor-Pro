@@ -1,6 +1,7 @@
 // server/controllers/listingController.js
 const Listing = require('../models/Listing');
 const User = require('../models/User');
+const mongoose = require('mongoose');
 
 const createListing = async (req, res) => {
   console.log('\n🆕🆕🆕 === СОЗДАНИЕ ОБЪЯВЛЕНИЯ С ФОТО ===');
