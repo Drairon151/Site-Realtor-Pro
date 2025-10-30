@@ -7,7 +7,7 @@ import { fileData } from "../types/fileData";
 
 export default function useListingForm(){
 
-    const URL_LISTING = 'http://localhost:5000/api/listing';
+    const API_LISTING = 'http://localhost:5000/api/listing';
     
     const [
         listingOnLoading, 
@@ -27,26 +27,15 @@ export default function useListingForm(){
         event: React.FormEvent<HTMLFormElement>, 
         listingFormData: listingFormDataInterface,
         selectedFiles: fileData[],
-        photosBase64: (files: fileData[]) => Promise<string[]>
     ) => {
         
         
         event.preventDefault()
         setListingOnLoading(true)
-        const Base64photos = await photosBase64(selectedFiles)
 
+        console.log('Массив фоток перед отправкой ',selectedFiles.map(file=>file.file),)
 
         try{
-            const listingData = {
-                title: listingFormData.title,
-                price: listingFormData.price,
-                address: listingFormData.address,
-                city: listingFormData.city,
-                specs: listingFormData.specs,
-                description: listingFormData.description,
-                photos: Base64photos,
-            }
-
             for (let inputValue of Object.values(listingFormData)){
 
                 if(baseInputValidator(inputValue).validStatus == 'input is empty'){
@@ -55,13 +44,19 @@ export default function useListingForm(){
                 }
             }
 
-            const response =  await fetch(`${URL_LISTING}/createListing`,
+            const formData = new FormData();
+            formData.append('title',listingFormData.title)
+            formData.append('price',listingFormData.price)
+            formData.append('specs',listingFormData.specs)
+            formData.append('city',listingFormData.city)
+            formData.append('address',listingFormData.address)
+            formData.append('description',listingFormData.description)
+            selectedFiles.forEach(f => formData.append('photos', f.file));
+
+            const response =  await fetch(`${API_LISTING}/createListing`,
                 {
                 method: 'POST',
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(listingData),
+                body: formData,
                 credentials: 'include',
                 }
             )

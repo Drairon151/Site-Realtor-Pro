@@ -1,10 +1,10 @@
-import ListingCard from "./ListingCard/ListingCard";
+import ListingSection from "./ListingCard/ListingSection";
 
 export default function ListingPage(){
 
     return(
         <div className="listing-page">
-            <ListingCard/>
+            <ListingSection/>
         </div>
     )
 

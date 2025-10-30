@@ -17,7 +17,6 @@ export default function CreateListingForm(){
         
         photoChangeHandler,
         photoDeleteHandler,
-        photosBase64,
     } = useListingFormPhoto()
     
     const {
@@ -28,7 +27,7 @@ export default function CreateListingForm(){
     } = useListingFormField()
 
     return (
-        <form className="create-listing-form form" onSubmit={event=>createListing(event, listingFormData, selectedFiles, photosBase64)}>
+        <form className="create-listing-form form" onSubmit={event=>createListing(event, listingFormData, selectedFiles)}>
             <label className="create-listing-form_lable" htmlFor="listing-input-title">Название обьявления</label>
             <input
                 className="create-listing-form_input"

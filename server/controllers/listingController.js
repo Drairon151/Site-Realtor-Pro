@@ -4,60 +4,54 @@ const User = require('../models/User');
 const mongoose = require('mongoose');
 
 const createListing = async (req, res) => {
-  console.log('\n🆕🆕🆕 === СОЗДАНИЕ ОБЪЯВЛЕНИЯ С ФОТО ===');
-  console.log('📥 Тело запроса:', req.body);
-
+  console.log('\n🆕🆕🆕 === СОЗДАНИЕ ОБЪЯВЛЕНИЯ С ФОТО (multipart/form-data) ===');
+  
   const { title, price, address, city, specs, description } = req.body;
+  const files = req.files; // ← файлы уже здесь, как массив буферов
 
-  // 🔒 1. Проверка роли
+  console.log('Данные обьявления: ',req.body)
+  console.log('Файлы обьявления: ',files)
+
+
+  // 🔒 Проверка роли
   if (req.user.role !== 'realtor') {
-    return res.status(403).json({
-      status: 'error',
-      message: 'Только риелторы могут создавать объявления'
-    });
+    return res.status(403).json({ message: 'Только риелторы могут создавать объявления' });
   }
 
-  // 🧾 2. Валидация полей
+  // 🧾 Валидация полей
   if (!title || !price || !address || !city || !specs || !description) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Все поля обязательны'
-    });
+    console.log('Все поля обязательны')
+    return res.status(400).json({ message: 'Все поля обязательны' });
   }
 
   const priceNum = Number(price);
   if (isNaN(priceNum) || priceNum <= 0 || priceNum > 500_000_000) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Некорректная цена'
-    });
+    console.log('Некоректная ценя')
+    return res.status(400).json({ message: 'Некорректная цена' });
   }
 
   if (!/^[а-яА-ЯёЁ\s\-]+$/.test(city.trim())) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Город должен содержать только кириллицу'
-    });
+    console.log('Город должен содержать только кирилицу')
+    return res.status(400).json({ message: 'Город должен содержать только кириллицу' });
   }
 
   try {
-    // 👤 3. Проверка автора
+    // 👤 Проверка автора
     const author = await User.findById(req.user._id);
     if (!author) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'Пользователь не найден'
-      });
+      return res.status(404).json({ message: 'Пользователь не найден' });
     }
 
-    // 🖼 4. Загрузка фото на ImgBB (если есть)
+    // 🖼 Загрузка фото в ImgBB (только если есть файлы)
     let imageUrls = [];
-    if (req.body.photos && Array.isArray(req.body.photos)) {
-      console.log(`📤 Загрузка ${req.body.photos.length} фото на ImgBB...`);
-      const uploadPromises = req.body.photos.map(async (base64Image) => {
+    if (files && files.length > 0) {
+      console.log(`📤 Загрузка ${files.length} фото в ImgBB...`);
+      for (const file of files) {
+        const base64 = file.buffer.toString('base64'); // ← буфер → base64 (только для ImgBB)
+
         const formData = new URLSearchParams();
         formData.append('key', process.env.IMGBB_API_KEY);
-        formData.append('image', base64Image); // ImgBB принимает base64
+        formData.append('image', base64);
 
         try {
           const response = await fetch('https://api.imgbb.com/1/upload', {
@@ -68,24 +62,18 @@ const createListing = async (req, res) => {
 
           const data = await response.json();
           if (data.success) {
+            imageUrls.push(data.data.url);
             console.log('✅ Фото загружено:', data.data.url);
-            return data.data.url;
           } else {
-            console.warn('⚠️ ImgBB ошибка:', data.error?.message || 'Неизвестная ошибка');
-            return null;
+            console.warn('⚠️ ImgBB ошибка:', data.error?.message);
           }
         } catch (err) {
           console.error('💥 Ошибка загрузки фото:', err.message);
-          return null;
         }
-      });
-
-      const results = await Promise.all(uploadPromises);
-      imageUrls = results.filter(url => url !== null); // убираем неудачные
-      console.log(`✅ Успешно загружено фото: ${imageUrls.length}`);
+      }
     }
 
-    // 📦 5. Создание объявления
+    // 📦 Создание объявления
     const newListing = new Listing({
       title: title.trim(),
       price: priceNum,
@@ -119,12 +107,11 @@ const createListing = async (req, res) => {
     console.log('🆕🆕🆕 === СОЗДАНИЕ ЗАВЕРШЕНО ===\n');
   } catch (err) {
     console.error('💥 Ошибка при создании объявления:', err);
-    res.status(500).json({
-      status: 'error',
-      message: 'Ошибка сервера при создании объявления'
-    });
+    res.status(500).json({ message: 'Ошибка сервера при создании объявления' });
   }
 };
+
+module.exports = { createListing };
 
 // Получение одного объявления по ID
 const getListingById = async (req, res) => {
