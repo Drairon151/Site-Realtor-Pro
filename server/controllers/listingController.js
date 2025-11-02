@@ -148,7 +148,59 @@ const getListingById = async (req, res) => {
   }
 };
 
+// Получение номера телефона автора объявления
+const getListingAuthorPhone = async (req, res) => {
+  const { id } = req.params;
+
+  // 🔒 Валидация ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Некорректный ID объявления'
+    });
+  }
+
+  try {
+    // 🔍 Находим объявление и запрашиваем только author._id
+    const listing = await Listing.findById(id, 'author');
+    if (!listing) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Объявление не найдено'
+      });
+    }
+
+    // 👤 Получаем номер телефона автора (только если пользователь авторизован!)
+    if (!req.user) {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Требуется авторизация для просмотра контактов'
+      });
+    }
+
+    const author = await User.findById(listing.author, 'numberPhone');
+    if (!author || !author.numberPhone) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Номер телефона не указан'
+      });
+    }
+
+    res.json({
+      status: 'success',
+      phone: author.numberPhone
+    });
+  } catch (err) {
+    console.error('💥 Ошибка при получении номера телефона:', err);
+    res.status(500).json({
+      status: 'error',
+      message: 'Ошибка сервера'
+    });
+  }
+};
+
 module.exports = {
   createListing,
   getListingById,
+  getListingAuthorPhone,
 };

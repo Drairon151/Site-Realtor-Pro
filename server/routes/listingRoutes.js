@@ -13,7 +13,7 @@ router.post(
   listingController.createListing
 );
 router.post('/:id', authMiddleware, listingController.getListingById);
-
+router.post('/:id/phone', authMiddleware, listingController.getListingAuthorPhone)
 // GET /api/listings → список объявлений (будет позже)
 // router.get('/listings', listingController.getListings);
 

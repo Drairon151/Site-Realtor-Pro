@@ -2,55 +2,7 @@
     padding-top: 100px;
 }
 
-.listing-photos-gallery{
-    width: 500px;
-    border: 5px solid black;
-}
-
-.image-frame{
-
-}
-
-.image-frame__controlButtonArea{
-    height: 100%;
-    width: 50px;
-
-}
-
-.image-frame__control--button{
-    width: 50px;
-    height: 50px;
-
-    z-index: 1;
-
-    background-repeat: no-repeat;
-}
-
-.image-frame__control--button-decrement{
-    background-image: url("../../../../assets/img/icons/left-arrow.svg");
-}
-
-.image-frame__control--button-increment{
-    background-image: url("../../../../assets/img/icons/right-arrow.svg");
-}
-
-.selected-photo_img{
-    width: 300px;
-    height: 300px;
-
-    object-fit: cover;
-}
-
-.images-preview{
-    width: 100px;
-    height: 100px;
-
-    object-fit: cover;
-}
-
-.images-preview_img{
-    width: 100px;
-    height: 100px;
-
-    object-fit: cover;
+.listing-content{
+    width: 100%;
+    margin-left: 100px;
 }

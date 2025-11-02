@@ -1,0 +1,43 @@
+.listing-information{
+    max-width: 500px;
+    margin-left: 20px;
+}
+
+.listing-info_title{
+    font-size: 30px;
+}
+
+.listing-info_base{
+    font-size: 20px;
+    padding: 5px;
+}
+
+.listing-info_base span{
+    font-weight: 700;
+
+    padding-right: 10px;
+}
+
+.listing-info_base--price{
+    color: rgb(43, 136, 107);
+}
+
+.listing-info_button{
+    background-color: gray;
+    border-radius: 50px;
+    padding: 15px;
+    margin: 10px;
+
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.listing-info_button--numberPhone{
+    background-color: #00b253;
+}
+
+.listing-info_button--writeSeller{
+    background-color: #0099f7;
+
+}
