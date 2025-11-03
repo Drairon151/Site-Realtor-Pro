@@ -1,4 +1,5 @@
 export interface Listing{
+    _id:string
     title: string
     price: string
     address: string
@@ -6,4 +7,5 @@ export interface Listing{
     specs: string
     description: string
     images: string[],
+    createAt: string
 }

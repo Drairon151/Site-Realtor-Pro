@@ -26,7 +26,7 @@ export default function Sidebar(){
         menuItems.push(
             { label: 'Создать обьявление', path: '/listing/new' },
             { label: 'Мои объявления', path: '/listings/my' },
-            { label: 'Мои отзывы', path: '/reviews' },
+            { label: 'Отзывы', path: '/reviews' },
         );
     }
 

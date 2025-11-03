@@ -1,4 +1,4 @@
-import ListingSection from "./ListingCard/ListingSection";
+import ListingSection from "./ListingSection/ListingSection";
 
 export default function ListingPage(){
 

@@ -66,6 +66,26 @@ export default function useListing() {
         }
     }
 
+    const deleteListing = async(_id:string, getMyListings:()=>void)=>{
+        try{
+
+            const response = await fetch(`${API_LISTING}/${_id}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            if(!response.ok){
+                const errorData = await response.json()
+                throw new Error(errorData.status || 'Delete listing error')
+            }
+
+            getMyListings()
+
+        }catch(error){
+
+        }
+    }
+
     
 
     return {
@@ -75,5 +95,6 @@ export default function useListing() {
 
         getListingById,
         getListingAuthorPhone,
+        deleteListing,
     }
 }

@@ -111,8 +111,6 @@ const createListing = async (req, res) => {
   }
 };
 
-module.exports = { createListing };
-
 // Получение одного объявления по ID
 const getListingById = async (req, res) => {
   const { id } = req.params;
@@ -135,9 +133,22 @@ const getListingById = async (req, res) => {
       });
     }
 
+    // Формируем ответ в том же формате, что и /listings/my
+    const listingData = {
+      _id: listing._id,
+      title: listing.title,
+      price: listing.price,
+      address: listing.address,
+      city: listing.city,
+      specs: listing.specs,
+      description: listing.description,
+      images: listing.images,
+      createdAt: listing.createdAt // ← добавлено
+    };
+
     res.json({
       status: 'success',
-      listing
+      listing: listingData
     });
   } catch (err) {
     console.error('💥 Ошибка при получении объявления:', err);
@@ -199,8 +210,57 @@ const getListingAuthorPhone = async (req, res) => {
   }
 };
 
+// Удаление объявления
+const deleteListing = async (req, res) => {
+  const { id } = req.params;
+
+  // 🔒 1. Валидация ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Некорректный ID объявления'
+    });
+  }
+
+  try {
+    // 🔍 2. Находим объявление
+    const listing = await Listing.findById(id);
+    if (!listing) {
+      console.log('КАПУТ ЧИТИРИСТА ЧИТИРЕ')
+      return res.status(404).json({
+        status: 'error',
+        message: 'Объявление не найдено'
+      });
+    }
+
+    // 🔐 3. Проверка: может ли пользователь удалять это объявление?
+    if (listing.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'У вас нет прав на удаление этого объявления'
+      });
+    }
+
+    // 🗑 4. Удаляем
+    await Listing.findByIdAndDelete(id);
+    console.log(`🗑️ Объявление ${id} удалено пользователем ${req.user._id}`);
+
+    res.json({
+      status: 'success',
+      message: 'Объявление успешно удалено'
+    });
+  } catch (err) {
+    console.error('💥 Ошибка при удалении объявления:', err);
+    res.status(500).json({
+      status: 'error',
+      message: 'Ошибка сервера при удалении объявления'
+    });
+  }
+};
+
 module.exports = {
   createListing,
   getListingById,
   getListingAuthorPhone,
+  deleteListing,
 };
