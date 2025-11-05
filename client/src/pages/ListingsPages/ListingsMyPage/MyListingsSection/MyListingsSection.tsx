@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import useListings from '../../../../hooks/useListings'
 import './MyListingsSection.css'
-import ListingCard from './components/ListingCard/ListingCard';
+import ListingCard from '../../../../components/ListingCard/ListingCard';
 
 import trashBusketIcon from '../../../../assets/img/icons/trash-basket-icon.png'
 import changeIcon from '../../../../assets/img/icons/change-icon.png'

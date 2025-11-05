@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { Listing } from "../../../../../../types/listing"
+import { Listing } from "../../types/listing"
 
 import './ListingCard.css'
 

@@ -32,6 +32,53 @@ const getMyListings = async (req, res) => {
   }
 };
 
+// Получение всех публичных объявлений с фильтрацией и сортировкой
+const getListings = async (req, res) => {
+  try {
+    const { city, minPrice, maxPrice, sortBy = 'createdAt', order = 'desc', page = 1 } = req.query;
+    const limit = 12; // 12 объявлений на страницу
+    const skip = (page - 1) * limit;
+
+    // Формируем фильтр
+    const filter = {};
+    if (city) filter.city = new RegExp(`^${city.trim().toLowerCase()}$`, 'i');
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+
+    // Формируем сортировку
+    const sort = {};
+    const validSortFields = ['price', 'createdAt'];
+    if (validSortFields.includes(sortBy)) {
+      sort[sortBy] = order === 'asc' ? 1 : -1;
+    } else {
+      sort.createdAt = -1; // по умолчанию — новые первыми
+    }
+
+    // Запрос с пагинацией
+    const listings = await Listing.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .populate('author', 'name surname role');
+
+    const total = await Listing.countDocuments(filter);
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      status: 'success',
+      listings,
+      pagination: { page: Number(page), totalPages, total }
+    });
+  } catch (err) {
+    console.error('💥 Ошибка при получении объявлений:', err);
+    res.status(500).json({ message: 'Ошибка сервера' });
+  }
+};
+
 module.exports = {
-  getMyListings
+  getMyListings,
+  getListings,
 };

@@ -16,6 +16,10 @@ import RealtorLayout from './layouts/RealtorLayout';
 import ListingNewPage from './pages/ListingPages/ListingNewPage/ListingNewPage';
 import ListingPage from './pages/ListingPages/ListingPage/ListingPage';
 import ListingsMyPage from './pages/ListingsPages/ListingsMyPage/ListingsMyPages';
+import RealtorsPage from './pages/RealtorsPage/RealtorsPage';
+import ListingsPage from './pages/ListingsPages/ListingsPage/ListingsPage';
+
+
 
 function App() {
 
@@ -39,6 +43,10 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
 
               <Route path="/listing/:listingId" element={<ListingPage/>} />
+
+              <Route path="/listings" element={<ListingsPage/>} />
+
+              <Route path="/realtors" element={<RealtorsPage/>} />
 
             </Route>
 

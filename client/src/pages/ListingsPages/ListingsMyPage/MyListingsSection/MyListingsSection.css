@@ -1,9 +1,10 @@
-.listing-card_edit--buttons{
-    width: 100px;
+.my-listings-section{
+    padding-bottom: 200px;
+    padding-top: 100px;
 }
 
-.my-listings-section{
-    padding-top: 100px;
+.listing-card_edit--buttons{
+    width: 100px;
 }
 
 .listing-cards{

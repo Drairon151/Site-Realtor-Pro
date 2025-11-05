@@ -20,6 +20,7 @@ export default function Sidebar(){
         { label: 'Профиль', path: '/profile' },
         { label: 'Чаты', path: '/chats' },
         { label: 'Объявления', path: '/listings' },
+        { label: 'Риелторы', path: '/realtors'}
     );
 
     if(user.role == 'realtor'){

@@ -1,10 +1,31 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Listing } from "../types/listing";
+
+export type ListingFilter = {
+  city: string;
+  minPrice: string;
+  maxPrice: string;
+  sortBy: 'createdAt' | 'price';
+  order: 'asc' | 'desc';
+};
 
 export default function useListings(){
     const API_LISTINGS = 'http://localhost:5000/api/listings'
 
     const [myListings, setMyListings] = useState<Listing[]|null>(null)
+    const [listings, setListings] = useState<Listing[]>([]);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [loading, setLoading] = useState(true);
+    
+    const filters: ListingFilter = {
+        city: searchParams.get('city') || '',
+        minPrice: searchParams.get('minPrice') || '',
+        maxPrice: searchParams.get('maxPrice') || '',
+        sortBy: (searchParams.get('sortBy') as any) || 'createdAt',
+        order: (searchParams.get('order') as any) || 'desc',
+    };
 
     const getMyListings = async ()=>{
 
