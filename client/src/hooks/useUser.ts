@@ -30,16 +30,15 @@ export default function useUser(){
 
     const API_USER: string = 'http://localhost:5000/api/user';
     const [cooldownTimer, setCooldownTimer] = useState<number>(0);
-    const [userAuthorized, setUserAuthorized] = useState<boolean | null>(null)
+    const [userAuthorized, setUserAuthorized] = useState<boolean>(false)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [userLoading, setUserLoading] = useState<boolean>(false);
     
     useEffect(()=>{
         const checkAuth = async () => {
             setUserLoading(true)
-            setUserAuthorized(null)
+            setUserAuthorized(false)
 
-            console.log('Проверка авторизации')
             try {
 
                 const response = await fetch('http://localhost:5000/api/me', {
@@ -62,7 +61,6 @@ export default function useUser(){
                 const result = await response.json() as MeResponse;
                 setUserAuthorized(true)
                 setUser(result.user);
-                console.log('Данные успешно получены',result.user)
             }catch(error){
                 if (error instanceof Error) {
                     console.log(error.message);
@@ -151,7 +149,6 @@ export default function useUser(){
             oldPassword: formData.get('oldPassword'),
             newPassword: formData.get('newPassword'), 
         }
-        console.log(userData)
         try{
             const response = await fetch(`${API_USER}/change-password`, {
                 method: 'POST',
@@ -239,7 +236,6 @@ export default function useUser(){
             _id: user._id
         };
 
-        console.log(userData)
 
         try{
             const response = await fetch(`${API_USER}/resend-password-reset-code`,{
@@ -264,7 +260,6 @@ export default function useUser(){
             }
             
             const result = await response.json()
-            console.log(result.cooldown)
             setCooldownTimer(result.cooldown);
         }catch(error){
             if (error instanceof Error) {

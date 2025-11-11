@@ -6,7 +6,7 @@ import useUser from '../../hooks/useUser';
 
 
 export default function Authorization(){
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
     const {user} = useUserContext()
 
@@ -21,7 +21,7 @@ export default function Authorization(){
             {
                 userLoading ?(
                     <p>Загрузка...</p>
-                ): userAuthorized ? (
+                ): userAuthorized ?(
                     <button 
                         className="nav-button nav-button_profile"
                         onClick={() => navigate('/profile')}

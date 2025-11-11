@@ -3,11 +3,11 @@ import { useSearchParams } from "react-router-dom";
 import { Listing } from "../types/listing";
 
 export type ListingFilter = {
-  city: string;
-  minPrice: string;
-  maxPrice: string;
-  sortBy: 'createdAt' | 'price';
-  order: 'asc' | 'desc';
+    city: string;
+    minPrice: string;
+    maxPrice: string;
+    sortBy: 'createdAt' | 'price';
+    order: 'asc' | 'desc';
 };
 
 export default function useListings(){
@@ -38,7 +38,6 @@ export default function useListings(){
             params.append('sortBy', filters.sortBy);
             params.append('order', filters.order);
 
-            console.log('Начало запроса обьявлений')
             const response = await fetch(`${API_LISTINGS}/all?${params}`,{
                 method: 'GET',
                 credentials: 'include',
@@ -52,7 +51,6 @@ export default function useListings(){
             const result = await response.json();
             setListings(result.listings);
         }catch(error){
-            console.log('Ошибка при запросе обьявлений')
         }finally{
             setListingsLoading(false);
         }
@@ -87,7 +85,6 @@ export default function useListings(){
             const result = await response.json(); 
 
             setMyListings(result.listings)
-            console.log('Данные обьявлений получены: ',result.listings)
         }catch(error){
 
         }

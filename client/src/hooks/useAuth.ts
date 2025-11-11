@@ -7,8 +7,8 @@ import useUser from './useUser';
 
 export default function useAuth(){
     interface EmailAuthStatus{
-        status: string,
-        type: string
+        status: string | null,
+        type: string | null,
     }
 
     const {
@@ -63,7 +63,6 @@ export default function useAuth(){
 
         };
 
-        console.log('Данные пользователя: ', userData)
 
         try{
             const response = await fetch(`${API_AUTH}/register`,{
@@ -133,8 +132,7 @@ export default function useAuth(){
                 }
 
             const result = await response.json()
-
-            navigate('/', { replace: true });
+            navigate('/profile', { replace: true });
             
             setUserAuthorized(true)
             setUser({...userData, ...result.user})
@@ -175,7 +173,6 @@ export default function useAuth(){
 
             if(!response.ok){
                 
-                console.log('ААА ШИБКА', result)
 
                 setEmailAuthStatus({...emailAuthStatus, type: result.type})
 
@@ -234,7 +231,6 @@ export default function useAuth(){
                 }
 
             const result = await response.json()
-            console.log(result.cooldown)
             setCooldownTimer(result.cooldown);
 
         }catch(error){

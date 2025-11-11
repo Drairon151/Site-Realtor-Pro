@@ -35,7 +35,7 @@ export default function ListingsSection(){
             <div className="listing-filter">
                 <input
                     className="listing-filter_input"
-                    placeholder=""
+                    placeholder="Город"
                     value={filters.city}
                     onBlur={event=>handleFilterChange({city: event.target.value})}
                 />

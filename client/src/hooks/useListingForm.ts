@@ -33,7 +33,6 @@ export default function useListingForm(){
         event.preventDefault()
         setListingOnLoading(true)
 
-        console.log('Массив фоток перед отправкой ',selectedFiles.map(file=>file.file),)
 
         try{
             for (let inputValue of Object.values(listingFormData)){

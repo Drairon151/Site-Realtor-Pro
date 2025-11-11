@@ -1,4 +1,4 @@
 export interface EmailStatus{
-    status: string,
-    type: string,
+    status: string | null,
+    type: string | null,
 }

@@ -22,7 +22,7 @@ export default function RegistrationPage(){
 
             <div className="auth-pages_container">
 
-                {emailAuthStatus.status === null ?(
+                {emailAuthStatus.status === null?(
                     <Registration
                         registration={registration}
                     />
