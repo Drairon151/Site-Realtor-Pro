@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 
 import ListingCard from "../../../../components/ListingCard/ListingCard";
 import useListings from "../../../../hooks/useListings";
 
 import './ListingSection.css'
+import sortIcon from '../../../../assets/img/icons/sort.svg'
 
 export default function ListingsSection(){
 
@@ -17,64 +18,129 @@ export default function ListingsSection(){
 
         getListings,
         handleFilterChange,
+        loadMore,
     } = useListings()
 
-
+    const [
+        filterInputs,
+        setFilterInputs,
+    ] = useState({
+        city: '',
+        minPrice : '',
+        maxPrice : '',
+    })
 
     useEffect(() => {
 
         getListings();
     }, [searchParams]);
 
-
-
+    function filterInputChangeHandler(event: React.ChangeEvent<HTMLInputElement>){
+        setFilterInputs(prev=>({
+            ...prev,
+            [event.target.name]: event.target.value
+        }))
+    }
     
     return (
         <div className="listings-section">
 
-            <div className="listing-filter">
+            <div className="listing-filter flex center">
+                
                 <input
-                    className="listing-filter_input"
+                    className="listing-filter_input listing-filter_element"
                     placeholder="Город"
-                    value={filters.city}
-                    onBlur={event=>handleFilterChange({city: event.target.value})}
+                    name="city"
+                    value={filterInputs.city}
+                    onChange={filterInputChangeHandler}
+                    onBlur={event=>handleFilterChange(filterInputs.city, 'city')}
                 />
+
                 <input
-                    className="listing-filter_input"
+                    className="listing-filter_input listing-filter_element"
                     placeholder="Минимальная цена"
-                    value={filters.minPrice}
-                    onBlur={event=>handleFilterChange({minPrice: event.target.value})}
+                    name="minPrice"
+                    value={filterInputs.minPrice}
+                    onChange={filterInputChangeHandler}
+                    onBlur={event=>handleFilterChange(filterInputs.minPrice, 'minPrice')}
                 />
+
                 <input
-                    className="listing-filter_input"
+                    className="listing-filter_input listing-filter_element"
                     placeholder="Максимальная цена"
-                    value={filters.maxPrice}
-                    onBlur={event=>handleFilterChange({maxPrice: event.target.value})}
+                    name="maxPrice"
+                    value={filterInputs.maxPrice}
+                    onChange={filterInputChangeHandler}
+                    onBlur={event=>handleFilterChange(filterInputs.maxPrice, 'maxPrice')}
                 />
 
+                <div className="listing-filter_wrapper--select flex">
+                    <img
+                        className="listing-filter_img--sort-icon"
+                        src={
+                            sortIcon
+                        }
+                    />
+                    <select 
+                        name="sort"
+                        className="listing-filter_select listing-filter_element"
+
+                        value={filters.sort}
+                        onChange={event=>handleFilterChange(event.target.value, 'sort')}
+                    >
+                        <option 
+                            value="newest"
+                            className="listing-filter_option listing-filter_element"
+                        >Сначала новые</option>
+                        <option 
+                            value="oldest"
+                            className="listing-filter_option listing-filter_element"
+                        >Сначала старые</option>
+                        <option 
+                            value="lowPrice"
+                            className="listing-filter_option listing-filter_element"
+                        >Сначала дешёвые</option>
+                        <option 
+                            value="highPrice"
+                            className="listing-filter_option listing-filter_element"
+                        >Сначала дорогие</option>
+                    </select>
+
+                </div>
+
             </div>
 
-            <div className="listings">
-                {
-                    listingsLoading
-                        ? (
-                            <div>
-                                Загрузка
-                            </div>
-                        )
-                        : !listings ? null
-                            :  (
-                            listings.map((listing, index)=>(
-                                <ListingCard
-                                    listing={listing}
-                                    index={index}
-                                    key={index}
-                                />
-                            )) 
+            <div className="flex center">
+                <div className="listings">
+                    {
+                        listingsLoading
+                            ? (
+                                <div>
+                                    Загрузка
+                                </div>
                             )
-                }
-            </div>
+                            : !listings ? null
+                                :  (
+                                listings.map((listing)=>(
+                                    <ListingCard
+                                        listing={listing}
+                                        key={listing._id}
+                                    />
+                                )) 
+                                )
+                    }
 
+
+                </div>
+            </div>
+            <div className="button_load-more--wrapper flex center">
+                <button
+                    className="button_load-more"
+                    onClick={loadMore}
+                >
+                    Следующая страница
+                </button>
+            </div>
         </div>
     )
 }

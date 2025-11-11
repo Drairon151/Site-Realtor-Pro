@@ -7,10 +7,9 @@ import './ListingCard.css'
 
 interface ListingCard{
     listing: Listing
-    index: number
 }
 
-export default function ListingCard({listing, index}:ListingCard){
+export default function ListingCard({listing}:ListingCard){
 
     const [listingCardPhotoId, setListingCardPhotoId] = useState<number>(0)
 
@@ -49,7 +48,6 @@ export default function ListingCard({listing, index}:ListingCard){
     return(
         <div 
             className="listing-card flex"
-            key={index}
             onClick={()=>openListingPageHandler(listing._id)}
         >
             {
@@ -72,7 +70,6 @@ export default function ListingCard({listing, index}:ListingCard){
                                 <ul className="photo-slider_list flex">
                                     {
                                         listingCardPhotos.map((image, index)=>
-                                        <>
             
                                             <li 
                                                 className="photo-slider_list--item flex"
@@ -81,7 +78,6 @@ export default function ListingCard({listing, index}:ListingCard){
                                             >
                                             </li>
 
-                                        </>
                                     )
                                     }
                                 </ul>

@@ -29,13 +29,12 @@ export default function MyListingsSection(){
                         ? 'Загрузка'
                         : 
                         <div className='listing-cards'>
-                            {myListings.map((listing, index)=>
+                            {myListings.map((listing)=>
                                 <div className='listing-card_edit flex center'
-                                    key={index}
+                                    key={listing._id}
                                 >
                                     <ListingCard
                                         listing = {listing}
-                                        index = {index}
                                     />
 
                                 <div className='listing-card_edit--buttons'>

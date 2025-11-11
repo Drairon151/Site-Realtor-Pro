@@ -6,8 +6,8 @@ export type ListingFilter = {
     city: string;
     minPrice: string;
     maxPrice: string;
-    sortBy: 'createdAt' | 'price';
-    order: 'asc' | 'desc';
+    sort: 'newest' | 'oldest' | 'lowPrice' | 'highPrice';
+    page: number,
 };
 
 export default function useListings(){
@@ -23,8 +23,8 @@ export default function useListings(){
         city: searchParams.get('city') || '',
         minPrice: searchParams.get('minPrice') || '',
         maxPrice: searchParams.get('maxPrice') || '',
-        sortBy: (searchParams.get('sortBy') as any) || 'createdAt',
-        order: (searchParams.get('order') as any) || 'desc',
+        sort: (searchParams.get('sort') as any) || 'newest',
+        page: Number(searchParams.get('page')) || 1,
     };
     
     const getListings = async () => {
@@ -35,8 +35,8 @@ export default function useListings(){
             if (filters.city) params.append('city', filters.city);
             if (filters.minPrice) params.append('minPrice', filters.minPrice);
             if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
-            params.append('sortBy', filters.sortBy);
-            params.append('order', filters.order);
+            params.append('sort', filters.sort);
+            params.append('page', String(filters.page))
 
             const response = await fetch(`${API_LISTINGS}/all?${params}`,{
                 method: 'GET',
@@ -57,16 +57,20 @@ export default function useListings(){
 
     }
 
-    const handleFilterChange = (newFilters: Record<string, string>) => {
-        setSearchParams(prev => {
-        const newParams = new URLSearchParams(prev);
-        Object.entries(newFilters).forEach(([key, value]) => {
-            if (value) newParams.set(key, value);
-            else newParams.delete(key);
-        });
-        return newParams;
-        });
+    const handleFilterChange = (newFilter: string | number, newFilterKey: string ) => {
+
+        setSearchParams(prev=>{
+            const next = new URLSearchParams(prev);
+            next.set(newFilterKey, String(newFilter));
+            return next;
+        })
+
     };
+
+    const loadMore = ()=>{
+        handleFilterChange(filters.page+1, 'page')
+        getListings()
+    }
 
     const getMyListings = async ()=>{
 
@@ -101,6 +105,7 @@ export default function useListings(){
         getListings,
         handleFilterChange,
         getMyListings,
+        loadMore,
     }
     
 }

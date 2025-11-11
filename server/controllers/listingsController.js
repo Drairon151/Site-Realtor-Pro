@@ -35,31 +35,56 @@ const getMyListings = async (req, res) => {
 // Получение всех публичных объявлений с фильтрацией и сортировкой
 const getListings = async (req, res) => {
   try {
-    const { city, minPrice, maxPrice, sortBy = 'createdAt', order = 'desc', page = 1 } = req.query;
-    const limit = 12; // 12 объявлений на страницу
-    const skip = (page - 1) * limit;
+    const { 
+      city, 
+      minPrice, 
+      maxPrice, 
+      sort = 'newest', // ← единый параметр
+      page = 1 
+    } = req.query;
 
-    // Формируем фильтр
+    const limit = 12;
+    const skip = (Number(page) - 1) * limit;
+
+    // 🔒 Валидация параметра сортировки
+    const validSortValues = ['newest', 'oldest', 'lowPrice', 'highPrice'];
+    if (!validSortValues.includes(sort)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Некорректный параметр сортировки. Допустимые значения: newest, oldest, lowPrice, highPrice'
+      });
+    }
+
+    // 🔍 Фильтрация
     const filter = {};
-    if (city) filter.city = new RegExp(`^${city.trim().toLowerCase()}$`, 'i');
+
+    if (city) {
+      filter.city = new RegExp(`^${city.trim().toLowerCase()}$`, 'i');
+    }
+
     if (minPrice || maxPrice) {
       filter.price = {};
-      if (minPrice) filter.price.$gte = Number(minPrice);
-      if (maxPrice) filter.price.$lte = Number(maxPrice);
+      if (minPrice && !isNaN(Number(minPrice))) {
+        filter.price.$gte = Number(minPrice);
+      }
+      if (maxPrice && !isNaN(Number(maxPrice))) {
+        filter.price.$lte = Number(maxPrice);
+      }
     }
 
-    // Формируем сортировку
-    const sort = {};
-    const validSortFields = ['price', 'createdAt'];
-    if (validSortFields.includes(sortBy)) {
-      sort[sortBy] = order === 'asc' ? 1 : -1;
-    } else {
-      sort.createdAt = -1; // по умолчанию — новые первыми
-    }
+    // 🧭 Сортировка — единый маппинг
+    const sortMapping = {
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 },
+      lowPrice: { price: 1 },
+      highPrice: { price: -1 }
+    };
 
-    // Запрос с пагинацией
+    const sortConfig = sortMapping[sort];
+
+    // 📦 Запрос
     const listings = await Listing.find(filter)
-      .sort(sort)
+      .sort(sortConfig)
       .skip(skip)
       .limit(limit)
       .populate('author', 'name surname role');
@@ -70,11 +95,18 @@ const getListings = async (req, res) => {
     res.json({
       status: 'success',
       listings,
-      pagination: { page: Number(page), totalPages, total }
+      pagination: {
+        page: Number(page),
+        totalPages,
+        total
+      }
     });
   } catch (err) {
     console.error('💥 Ошибка при получении объявлений:', err);
-    res.status(500).json({ message: 'Ошибка сервера' });
+    res.status(500).json({ 
+      status: 'error', 
+      message: 'Ошибка сервера при загрузке объявлений' 
+    });
   }
 };
 
