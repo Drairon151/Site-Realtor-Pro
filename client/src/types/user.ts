@@ -9,4 +9,6 @@ export interface User {
     mail: string,
     numberPhone: string,
     isDiplomaVerified: boolean,
+
+    avatarUrl: string|null,
 }

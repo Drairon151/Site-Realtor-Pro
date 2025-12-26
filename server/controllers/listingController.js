@@ -9,12 +9,12 @@ const createListing = async (req, res) => {
   const { title, price, address, city, specs, description } = req.body;
   const files = req.files; // ← файлы уже здесь, как массив буферов
 
-  console.log('Данные обьявления: ',req.body)
-  console.log('Файлы обьявления: ',files)
+  console.log('Роль автора: ',req.user)
 
 
   // 🔒 Проверка роли
   if (req.user.role !== 'realtor') {
+    console.log('Только риелтор может создать обьявление')
     return res.status(403).json({ message: 'Только риелторы могут создавать объявления' });
   }
 

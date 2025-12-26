@@ -1,6 +1,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from 'react-router-dom';
 import {User} from '../types/user'
+import photoValidator from "../utils/photoValidator";
 
 export default function useUser(){
     const navigate = useNavigate()
@@ -223,7 +224,7 @@ export default function useUser(){
         }
     }
 
-    const resendVerifyCodeChangePassword = async(event: FormEvent<HTMLFormElement>)=>{
+    const resendVerifyCodeChangePassword = async(event: React.MouseEvent<HTMLButtonElement>)=>{
         setIsLoading(true)
         event.preventDefault()
 
@@ -321,6 +322,37 @@ export default function useUser(){
             }
         }
 
+        const changeUserPhoto = async (newPhoto:FileList)=>{
+            try{
+                const validPhoto = photoValidator(newPhoto)
+
+                if(validPhoto.photoErrorStatus.length>0){
+                    throw new Error('Неккоректный тип файла') 
+                }
+
+                const formData = new FormData();
+                formData.append('avatar', validPhoto.validFiles[0]);
+                console.log('Проверка: ', validPhoto.validFiles[0])
+                const response = await fetch(
+                    `${API_USER}/change-user-photo`,
+                    {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'include',
+                    }
+                )
+
+                if(!response.ok){
+                    const errorData = await response.json();
+                    throw new Error(errorData.message ||'Ошибка обновления фото')
+                }
+
+            }catch(error){
+                console.log('Ошибка:',error)
+            }
+
+        }
+
 
     return {
         user,
@@ -344,5 +376,7 @@ export default function useUser(){
         userLoading,
         userAuthorized, 
         setUserAuthorized,
+
+        changeUserPhoto,
     }
 }

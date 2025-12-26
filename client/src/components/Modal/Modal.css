@@ -1,9 +1,8 @@
 .modal-dialog {
-    margin: 0 auto;
+  margin: 0 auto;
 }
 
 ::backdrop {
   background: rgba(0, 0, 0, 0.7);
-  /* Опционально: размытие фона */
   backdrop-filter: blur(4px);
 }

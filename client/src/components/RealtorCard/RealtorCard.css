@@ -1,0 +1,57 @@
+.realtor-card{
+    padding: 40px;
+    border-radius: 50px;
+    background-color: black;
+}
+
+.realtor-card p {
+    color: white;
+}
+
+.realtor-card_realtor-info{
+    margin-right: 40px;
+}
+
+.realtor-info_avatar{
+    width: 150px;
+}
+
+.realtor-info_full-name p{
+    font-size: 30px;
+}
+
+.realtor-card_realtor-description{
+    max-width: 400px;
+    
+}
+
+.realtor-description_text{
+    font-size: 20px;
+    padding-bottom:10px ;
+}
+
+.realtor-description_text span{
+    font-size: 20px;
+    font-weight: 600;
+    color: rgb(82, 145, 79);
+
+    padding-right: 20px;
+}
+
+.realtor-card_button{
+    padding: 20px;
+    font-size: 20px;
+    font-weight: 600;
+    border-radius: 25px;
+    margin: 20px 20px 0px 20px;
+    
+    color: white;
+}
+
+.realtor-card_button--numberPhone{
+    background-color: #00b253;
+}
+
+.realtor-card_button--writeSeller{
+    background-color: #0099f7;   
+}

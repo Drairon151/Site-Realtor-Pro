@@ -3,7 +3,7 @@ import { EmailStatus } from '../../../types/emailStatus'
 interface EmailAuthProps{
     cooldownTimer: number, 
     verifyEmail:(event: React.FormEvent<HTMLFormElement>)=>{} , 
-    resendVerification: ()=>{}, 
+    resendVerification: (event: React.MouseEvent<HTMLButtonElement>) => {}, 
     emailAuthStatus:EmailStatus,
 }
 

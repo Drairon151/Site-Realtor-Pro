@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
     enum: ['client', 'realtor'],
     default: 'client',
   },
+  avatarUrl: {
+    type: String,
+    default: null
+  },
   isVerified: {
     type: Boolean,
     default: false,
@@ -56,7 +60,8 @@ const userSchema = new mongoose.Schema({
   lastVerificationSentAt: {
     type: Date,
     default: null,
-  }
+  },
+  
 }, {
   timestamps: true
 });

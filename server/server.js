@@ -11,6 +11,7 @@ const profileRoutes = require('./routes/profileRoutes'); // ✅ Здесь!
 const userRoutes = require('./routes/userRoutes')
 const listingRoutes = require('./routes/listingRoutes');
 const listingsRoutes = require('./routes/listingsRoutes');
+const realtorRoutes = require('./routes/realtorRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,6 +29,8 @@ app.use('/api/user', authMiddleware, userRoutes);
 
 app.use('/api/listing', authMiddleware, listingRoutes); // ← все маршруты будут /api/listing, /api/listings
 app.use('/api/listings', authMiddleware, listingsRoutes); // ← все маршруты будут /api/listing, /api/listings
+
+app.use('/api/realtor', realtorRoutes);
 
 app.use('/api', profileRoutes);
 app.get('/', (req, res) => {

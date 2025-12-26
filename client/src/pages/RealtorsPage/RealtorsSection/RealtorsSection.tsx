@@ -1,26 +1,25 @@
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react"
 
+import useRealtor from "../../../hooks/useRealtor"
+import { RealtorsFilter } from "../../../hooks/useRealtor"
 
-import ListingCard from "../../../../components/ListingCard/ListingCard";
-import useListings from "../../../../hooks/useListings";
+import './RealtorsSection.css'
 
-import './ListingSection.css'
-import sortIcon from '../../../../assets/img/icons/sort.svg'
+import sortIcon from '../../../assets/img/icons/sort.svg'
+import RealtorCard from "../../../components/RealtorCard/RealtorCard"
 
-export default function ListingsSection(){
-
-
+export default function RealtorSection(){
     const {
-        searchParams,
-        listingsLoading,
-        listings,
-        filters,
-
-        getListings,
+        getRealtors,
         handleFilterChange,
         loadMore,
-    } = useListings()
 
+        searchParams,
+        realtorsLoading,
+        realtors,
+        filters,
+    } = useRealtor()
+    
     const [
         filterInputs,
         setFilterInputs,
@@ -32,7 +31,7 @@ export default function ListingsSection(){
 
     useEffect(() => {
 
-        getListings();
+        getRealtors();
     }, [searchParams]);
 
     function filterInputChangeHandler(event: React.ChangeEvent<HTMLInputElement>){
@@ -42,13 +41,17 @@ export default function ListingsSection(){
         }))
     }
     
-    return (
-        <div className="listings-section">
 
-            <div className="listing-filter flex center">
+    return(
+        <div
+            className="realtors-page_realtor-card-section"
+
+        >
+
+            <div className="realtor-filter flex center">
                 
                 <input
-                    className="listing-filter_input listing-filter_element"
+                    className="realtor-filter_input realtor-filter_element"
                     placeholder="Город"
                     name="city"
                     value={filterInputs.city}
@@ -57,7 +60,7 @@ export default function ListingsSection(){
                 />
 
                 <input
-                    className="listing-filter_input listing-filter_element"
+                    className="realtor-filter_input realtor-filter_element"
                     placeholder="Минимальная цена"
                     name="minPrice"
                     value={filterInputs.minPrice}
@@ -66,7 +69,7 @@ export default function ListingsSection(){
                 />
 
                 <input
-                    className="listing-filter_input listing-filter_element"
+                    className="realtor-filter_input realtor-filter_element"
                     placeholder="Максимальная цена"
                     name="maxPrice"
                     value={filterInputs.maxPrice}
@@ -74,36 +77,36 @@ export default function ListingsSection(){
                     onBlur={()=>handleFilterChange(filterInputs.maxPrice, 'maxPrice')}
                 />
 
-                <div className="listing-filter_wrapper--select flex">
+                <div className="realtor-filter_wrapper--select flex">
                     <img
-                        className="listing-filter_img--sort-icon"
+                        className="realtor-filter_img--sort-icon"
                         src={
                             sortIcon
                         }
                     />
                     <select 
                         name="sort"
-                        className="listing-filter_select listing-filter_element"
+                        className="realtor-filter_select realtor-filter_element"
 
                         value={filters.sort}
                         onChange={event=>handleFilterChange(event.target.value, 'sort')}
                     >
                         <option 
-                            value="newest"
-                            className="listing-filter_option listing-filter_element"
-                        >Сначала новые</option>
-                        <option 
-                            value="oldest"
-                            className="listing-filter_option listing-filter_element"
-                        >Сначала старые</option>
-                        <option 
                             value="lowPrice"
-                            className="listing-filter_option listing-filter_element"
+                            className="realtor-filter_option realtor-filter_element"
                         >Сначала дешёвые</option>
                         <option 
                             value="highPrice"
-                            className="listing-filter_option listing-filter_element"
+                            className="realtor-filter_option realtor-filter_element"
                         >Сначала дорогие</option>
+                        <option 
+                            value="moreDeals"
+                            className="realtor-filter_option realtor-filter_element"
+                        >Больше сделок</option>
+                        <option 
+                            value="lessDeals"
+                            className="realtor-filter_option realtor-filter_element"
+                        >Меньше сделок</option>
                     </select>
 
                 </div>
@@ -111,21 +114,25 @@ export default function ListingsSection(){
             </div>
 
             <div className="flex center">
-                <div className="listings">
+                <div className="realtors">
                     {
-                        listingsLoading
+                        realtorsLoading
                             ? (
                                 <div>
                                     Загрузка
                                 </div>
                             )
-                            : !listings ? null
+                            : !realtors ? null
                                 :  (
-                                listings.map((listing)=>(
-                                    <ListingCard
-                                        listing={listing}
-                                        key={listing._id}
-                                    />
+                                realtors.map((realtor, index)=>(
+                                    <div
+                                        className="realtor-card-wrapper"
+                                    >
+                                        <RealtorCard
+                                            realtor={realtor}
+                                            key={index}
+                                        />
+                                    </div>
                                 )) 
                                 )
                     }
@@ -141,6 +148,7 @@ export default function ListingsSection(){
                     Следующая страница
                 </button>
             </div>
+
         </div>
     )
 }

@@ -61,6 +61,8 @@ export default function useAuth(){
             role: formData.get('role'),
             isDiplomaVerified: false,
 
+            avatarUrl:null,
+
         };
 
 

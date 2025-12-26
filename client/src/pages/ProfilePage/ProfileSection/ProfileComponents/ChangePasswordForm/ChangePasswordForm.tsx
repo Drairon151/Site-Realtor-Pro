@@ -2,7 +2,11 @@ import EmailAuth from "../../../../../components/Authorization/EmailAuth/EmailAu
 import useUser from "../../../../../hooks/useUser"
 import './ChangePasswordForm.css'
 
-export default function ChangePasswordForm({onClose}){
+interface ChangePasswordForm{
+    onClose: ()=>void,
+}
+
+export default function ChangePasswordForm({onClose}:ChangePasswordForm){
     const{
         cooldownTimer,
         emailVerificationStatus,

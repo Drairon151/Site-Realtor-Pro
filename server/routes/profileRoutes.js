@@ -15,6 +15,7 @@ router.get('/me', authMiddleware, async (req, res) => {
       role 
       numberPhone 
       isDiplomaVerified
+      avatarUrl
     `);
 
     if (!user) {

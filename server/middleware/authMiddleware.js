@@ -1,12 +1,13 @@
+const User = require('../models/User')
 // server/middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const authMiddleware = async (req, res, next) => {
-  console.log('\n🔐 === ПРОВЕРКА АВТОРИЗАЦИИ ===');
+  // console.log('\n🔐 === ПРОВЕРКА АВТОРИЗАЦИИ ===');
 
   // 1. Проверяем, есть ли куки вообще
-  console.log('🍪 req.cookies:', req.cookies);
+  // console.log('🍪 req.cookies:', req.cookies);
 
   const token = req.cookies.token;
 
@@ -19,15 +20,18 @@ const authMiddleware = async (req, res, next) => {
     });
   }
 
-  console.log('✅ Токен найден:', token.substring(0, 20) + '...');
+  // console.log('✅ Токен найден:', token.substring(0, 20) + '...');
+  // console.log('✅ Токен найден:');
 
   try {
     // 2. Проверяем и расшифровываем JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('✅ Токен валиден. Расшифрован:', decoded);
+    // console.log('✅ Токен валиден. Расшифрован:', decoded);
 
-    // 3. Сохраняем данные пользователя в запрос
-    req.user = decoded;
+    const user = await User.findById(decoded._id).select('-password'); 
+    if (!user) return res.status(401).json({ message: 'Пользователь не найден' });
+
+    req.user = user;
     next(); // разрешаем доступ к маршруту
   } catch (err) {
     if (err.name === 'TokenExpiredError') {

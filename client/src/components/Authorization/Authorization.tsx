@@ -21,11 +21,11 @@ export default function Authorization(){
             {
                 userLoading ?(
                     <p>Загрузка...</p>
-                ): userAuthorized ?(
+                ): userAuthorized && user ?(
                     <button 
                         className="nav-button nav-button_profile"
                         onClick={() => navigate('/profile')}
-                    >{user? user.name: 'Нет данных'}</button>
+                    >{user.name}</button>
                 ):(
                     <>
 

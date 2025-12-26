@@ -5,6 +5,9 @@ import { Listing } from "../../types/listing"
 
 import './ListingCard.css'
 
+import paginationPointIcon from '../../assets/img/icons/pagination-point-icon.svg'
+import plug from '../../assets/img/icons/plug.png'
+
 interface ListingCard{
     listing: Listing
 }
@@ -50,40 +53,51 @@ export default function ListingCard({listing}:ListingCard){
             className="listing-card flex"
             onClick={()=>openListingPageHandler(listing._id)}
         >
-            {
+            
 
-                !listingCardPhotos
-                    ? 
-                        <div>
-                            Фоточек ниту
-                        </div>
-                    :
+
                         <div className="photo-slider_wrapper flex center">
                             <div className="photo-slider flex">
+                            {
+                                listingCardPhotos.length == 0
+                                ? 
+                                    <img 
+                                        className="photo-slider_select-image"
+                                        src={plug}
+                                    />  
+                                :
+                                <>
+                                    <img 
+                                        className="photo-slider_select-image"
+                                        src={listing.images[listingCardPhotoId]}
+                                    />  
 
-                                <img 
-                                    className="photo-slider_select-image"
-                                    src={listing.images[listingCardPhotoId]}
-                                />  
 
+                                    <ul className="photo-slider_list flex">
+                                        {
+                                            listingCardPhotos.map((image, index)=>
+                
+                                                <li 
+                                                    className="photo-slider_list--item flex center"
+                                                    onMouseOver={()=>setListingCardPhotoId(index)}
+                                                    key={index}
+                                                >
+                                                    <img 
+                                                        className={`pagination-point-icon ${
+                                                            listingCardPhotoId==index?'active':''
+                                                        }`}
+                                                        src={paginationPointIcon}
+                                                    />
+                                                </li>
 
-                                <ul className="photo-slider_list flex">
-                                    {
-                                        listingCardPhotos.map((image, index)=>
-            
-                                            <li 
-                                                className="photo-slider_list--item flex"
-                                                onMouseOver={()=>setListingCardPhotoId(index)}
-                                                key={index}
-                                            >
-                                            </li>
-
-                                    )
-                                    }
-                                </ul>
+                                        )
+                                        }
+                                    </ul>
+                                </>
+                            }
                             </div>
                         </div>
-            }
+            
 
             <div className="listing-card_information">
                 <p className="listing-card_info listing-card_info--title">{listing.title}</p>

@@ -8,9 +8,10 @@
 }
 
 .listing-filter{
-    margin-top: 25px;
+    z-index: 1;
+    top: 100px;
     margin-bottom: 100px;
-    
+    position: sticky;
     background-color: #9c9c9c;
 }
 

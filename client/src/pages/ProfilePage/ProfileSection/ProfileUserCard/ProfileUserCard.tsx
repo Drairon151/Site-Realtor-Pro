@@ -2,9 +2,12 @@ import './ProfileUserCard.css'
 import plug from '../../../../assets/img/icons/plug.png'
 import Modal from '../../../../components/Modal/Modal'
 import ChangePasswordForm from '../ProfileComponents/ChangePasswordForm/ChangePasswordForm'
+import ChangeUserPhotoForm from '../ProfileComponents/ChangeUserPhotoForm/ChangeUserPhotoForm'
 import { useEffect, useState } from 'react'
 
 import { User } from '../../../../types/user'
+
+import avatarChangeIcon from '../../../../assets/img/icons/edit-pen.svg'
 
 interface ProfileUserCardProps{
     user: User,
@@ -17,12 +20,18 @@ interface ProfileUserCardProps{
 
 export default function ProfileUserCard({user, updateUserField, sendVerifyCodeChangePassword, logout}:ProfileUserCardProps){    
 
-    const [isOpen, setIsOpen] = useState(false);
+    const [emailChangeIsOpen, setEmailChangeIsOpen] = useState(false);
+    const [photoChangeIsOpen, setPhotoChangeIsOpen] = useState(false);
+
     const [editUser, setEditUser] = useState<User>(user)
+    const [userAvatarOver,setUserAvatarOver] = useState(false)
+    const [userAvatarClick,setUserAvatarClick] = useState(false)
 
     useEffect(() => {
         setEditUser(user);
     }, [user]); 
+
+    
 
 
     function editUserChange(event: React.ChangeEvent<HTMLInputElement>){
@@ -74,16 +83,59 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
             <div className='user-card_user-info flex'>
 
                 <div className='user-basic-info'>
-                    <img className='user-basic-info_avatar' src={plug}/>
+                    <div
+                        className='user-basic-info_avatar'
+                        onMouseOver={()=>setUserAvatarOver(true)}
+                        onMouseOut={()=>setUserAvatarOver(false)}
+                        onClick={
+                            ()=>userAvatarClick ? setUserAvatarClick(false) : setUserAvatarClick(true)
+                        }
+                    >
+                        <img 
+                            className={`user-basic-info_avatar--img  ${userAvatarOver?'active':null}`} 
+                            src={
+                                user.avatarUrl
+                                ?user.avatarUrl
+                                :plug
+                            }
+                        />
+
+                        {
+                            userAvatarOver
+                                ? 
+                                    <img
+                                        className='user-avatar_change-icon'
+                                        src={avatarChangeIcon}
+                                    />
+                                : null
+                        }
+
+                        {
+                            userAvatarClick
+                                ?
+                                    <button
+                                        className='change-avatar-button'
+                                        onClick={()=>setPhotoChangeIsOpen(true)}
+                                    >
+                                        Изменение аватара
+                                    </button>
+                                : null
+                        }
+
+                    </div>
                     <h1 className='user-basic-info_name'>{user.name ?? 'Имя'}</h1>
                 </div>
 
                 <div className='user-contact-info'>
+
+                    <h2>Общая информация</h2>
+
                     <div className='user-contact-info_item'>
-                        <label className='user-contact-info_item--lable' htmlFor='surname'>
+                        <label className='user-contact-info_item--lable' htmlFor='user-contact-info_item--surname'>
                             Фамилия:
                         </label>
                         <input 
+                            id='user-contact-info_item--surname'
                             className='user-contact-info_item--input' 
                             name='surname' 
                             type='text' 
@@ -93,10 +145,11 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                         ></input>
                     </div>
                     <div className='user-contact-info_item'>
-                        <label className='user-contact-info_item--lable' htmlFor='name'>
+                        <label className='user-contact-info_item--lable' htmlFor='user-contact-info_item--name'>
                             Имя:
                         </label>
                         <input 
+                            id='user-contact-info_item--name'
                             className='user-contact-info_item--input' 
                             name='name' 
                             type='text' 
@@ -106,10 +159,11 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                         ></input>
                     </div>
                     <div className='user-contact-info_item'>
-                        <label className='user-contact-info_item--lable' htmlFor='patronymic'>
+                        <label className='user-contact-info_item--lable' htmlFor='user-contact-info_item--patronymic'>
                             Отчество:
                         </label>
                         <input 
+                            id='user-contact-info_item--patronymic'
                             className='user-contact-info_item--input' 
                             name='patronymic' 
                             type='text' 
@@ -119,24 +173,19 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                         ></input>
                     </div>
                     <div className='user-contact-info_item'>
-                        <label className='user-contact-info_item--lable' htmlFor='mail'>
-                            Почта:
-                        </label>
-                        <input
-                            className='user-contact-info_item--input' 
-                            name='mail' 
-                            type='text' 
-                            value={editUser.mail ?? 'example@mail.com'}
-                            onChange={editUserChange}
-                            onBlur={handlerUserChangeSave}
-                        ></input>
+                        <p
+                            className='user-contact-info_item--text' 
+                        ><span
+                            className='user-contact-info_item--lable'
+                        >Почта: </span>{editUser.mail}</p>
                     </div>
                     <div className='user-contact-info_item'>
-                        <label className='user-contact-info_item--lable' htmlFor='numberPhone'>
+                        <label className='user-contact-info_item--lable' htmlFor='user-contact-info_item--numberPhone'>
                             Номер телефона:
                         </label>
                         <input 
-                            className='user-contact-info_item--input' 
+                            id='user-contact-info_item--numberPhone'
+                            className='user-contact-info_item--input'
                             name='numberPhone' 
                             type='text' 
                             value={editUser.numberPhone?? '+7(880)5553535'}
@@ -152,10 +201,11 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                         ):(
                             <div className='user-contact-info_item'>
 
-                                <label className='user-contact-info_item--lable' htmlFor='role'>
+                                <label className='user-contact-info_item--lable' htmlFor='user-contact-info_item--client'>
                                     Клиент:
                                 </label>
                                 <input 
+                                    id='user-contact-info_item--client'
                                     className='user-contact-info_item--input-radio'
                                     name='role' 
                                     type='radio' 
@@ -164,10 +214,11 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                                     onClick={handleRadioChangeSave}
                                 ></input>
 
-                                <label className='user-contact-info_item--lable' htmlFor='role'>
+                                <label className='user-contact-info_item--lable' htmlFor='user-contact-info_item--realtor'>
                                     Риэлтор:
                                 </label>
                                 <input 
+                                    id='user-contact-info_item--realtor'
                                     className='user-contact-info_item--input-radio'
                                     name='role' 
                                     type='radio' 
@@ -181,22 +232,34 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
 
                 </div>
 
+
+
             </div>
 
             <div className='user-card_buttons'>
-                <button className='user-card_button user-card_button--changePassword' onClick={()=>{
-                    setIsOpen(true);
-                    sendVerifyCodeChangePassword()
-                    
-                }}>Смена пароля</button>
+                <button className='user-card_button user-card_button--changePassword' 
+                    onClick={()=>{
+                        setEmailChangeIsOpen(true);
+                        sendVerifyCodeChangePassword()
+                    }}
+                >
+                    Смена пароля</button>
                 <button className='user-card_button user-card_button--logout' onClick={logout}>Выйти из аккаунта</button>
             </div>
 
             <Modal
-                isOpen={isOpen}
+                isOpen={emailChangeIsOpen}
             >
                     <ChangePasswordForm onClose={()=>{
-                        setIsOpen(false)
+                        setEmailChangeIsOpen(false)
+                    }}/>
+            </Modal>
+
+            <Modal
+                isOpen={photoChangeIsOpen}
+            >
+                    <ChangeUserPhotoForm onClose={()=>{
+                        setPhotoChangeIsOpen(false)
                     }}/>
             </Modal>
 

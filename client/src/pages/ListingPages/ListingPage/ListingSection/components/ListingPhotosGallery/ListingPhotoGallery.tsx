@@ -2,6 +2,8 @@ import {useEffect, useState} from 'react';
 
 import './ListingPhotoGallery.css'
 
+import plug from '../../../../../../assets/img/icons/plug.png'
+
 interface ListingPhotoGallery{
     listingImagesUrls: string[];
     listingTitle: string;
@@ -39,6 +41,24 @@ export default function ListingPhotoGallery({listingImagesUrls, listingTitle}:Li
 
     return(
             <div className="listing-photos-gallery">
+                {
+                    listingImagesUrls.length == 0
+                    ?
+                        <div className="selected-photo flex">
+
+                            <span
+                                className="selected-photo_blur-img-background"
+                                style={{backgroundImage:`url(${plug})`}}
+                            ></span>
+
+                            <img 
+                                className="selected-photo_img" 
+                                src={plug}
+                                alt={listingTitle}
+                            />
+                        </div>
+                    :
+                    <>
                 <div className="image-frame flex">
                     <div className="image-frame__controlButtonArea image-frame__controlButtonArea-left"
                         onClick={()=>changeSelectPhotoHandler('decrement')}
@@ -88,6 +108,8 @@ export default function ListingPhotoGallery({listingImagesUrls, listingTitle}:Li
                     }
 
                 </div>
+                </>
+                }
             </div>
     )
 

@@ -11,7 +11,36 @@
 }
 
 .user-basic-info_avatar{
+    position: relative;
+}
+
+.user-basic-info_avatar--img{
     max-width: 100px;
+    transition: 0.2s;
+}
+
+.user-basic-info_avatar--img.active{
+    transition: 0.2s;
+    filter: blur(2.5px);
+}
+
+.user-avatar_change-icon{
+    width: 50px;
+    position: absolute;
+    left: 25px;
+    top:25px
+}
+
+.change-avatar-button{
+    top: 25%;
+    left: 120px;
+    position: absolute;
+    width: 150px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 25px;
+
+    font-size: 15px;
 }
 
 .user-basic-info_name{
@@ -36,6 +65,12 @@
     border: none;
     color: white;
     margin-left: 10px;
+}
+
+.user-contact-info_item--text{
+    background: none;
+    border: none;
+    color: white;
 }
 
 .user-card_button{

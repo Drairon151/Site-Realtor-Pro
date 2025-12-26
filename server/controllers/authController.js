@@ -10,7 +10,9 @@ require('dotenv').config();
 const generateToken = (user) => {
   console.log('🔐 Генерация JWT токена для пользователя:', user._id);
   return jwt.sign(
-    { _id: user._id, mail: user.mail, role: user.role },
+    { 
+      _id: user._id, 
+    },
     process.env.JWT_SECRET,
     { expiresIn: '7d' }
   );

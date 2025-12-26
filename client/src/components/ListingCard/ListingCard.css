@@ -42,6 +42,18 @@
 
 }
 
+.pagination-point-icon{
+    width: 25px;
+    opacity: 0.5;
+    transition: 0.5s;
+    
+}
+
+.pagination-point-icon.active{
+    transition: 0.5s;
+    opacity: 1;
+}
+
 .listing-card_information{
     flex: 1;
     padding: 20px;

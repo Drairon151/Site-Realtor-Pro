@@ -335,6 +335,99 @@ const updateUserField = async (req, res) => {
 
 };
 
+// --- СМЕНА ФОТО ПРОФИЛЯ ---
+const changeUserPhoto = async (req, res) => {
+  console.log('\n🖼🖼🖼 === СМЕНА ФОТО ПРОФИЛЯ ===');
+  const files = req.files[0];
+  console.log('Получена фотка: ',files)
+
+  try {
+    // 🔒 Проверяем, что пользователь авторизован (должен быть, т.к. middleware)
+    if (!req.user || !req.user._id) {
+      console.log('❌ Пользователь не авторизован');
+      return res.status(401).json({
+        status: 'error',
+        message: 'Требуется авторизация'
+      });
+    }
+
+    console.log('Сам файл! ',files)
+    // 📤 Файл есть?
+    if (!files) {
+      console.log('❌ Файл аватара не передан');
+      return res.status(400).json({
+        status: 'error',
+        message: 'Файл аватара обязателен'
+      });
+    }
+
+    const { buffer, mimetype } = files;
+
+    // ✅ Валидация MIME (дубль защиты)
+    if (!mimetype.startsWith('image/')) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Только изображения разрешены (jpeg, png, webp)'
+      });
+    }
+
+    // 🖼 Загрузка в ImgBB
+    console.log('📤 Загрузка фото в ImgBB...');
+    const base64 = buffer.toString('base64');
+    const formData = new URLSearchParams();
+    formData.append('key', process.env.IMGBB_API_KEY);
+    formData.append('image', base64);
+
+    const imgbbRes = await fetch('https://api.imgbb.com/1/upload', {
+      method: 'POST',
+      body: formData,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    });
+
+    const imgbbData = await imgbbRes.json();
+
+    if (!imgbbData.success) {
+      console.error('❌ ImgBB ошибка:', imgbbData.error?.message || 'Неизвестная ошибка');
+      return res.status(500).json({
+        status: 'error',
+        message: 'Не удалось загрузить изображение'
+      });
+    }
+
+    const avatarUrl = imgbbData.data.url;
+    console.log('✅ Фото загружено:', avatarUrl);
+
+    // 📥 Обновление пользователя
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id, // ← БЕРЁМ ИЗ СЕССИИ, НЕ ИЗ BODY
+      { avatarUrl },
+      { new: true, select: 'avatarUrl' }
+    );
+
+    if (!updatedUser) {
+      console.log('❌ Пользователь не найден при обновлении');
+      return res.status(404).json({
+        status: 'error',
+        message: 'Пользователь не найден'
+      });
+    }
+
+    console.log('✅ Аватар пользователя обновлён');
+    res.json({
+      status: 'success',
+      avatarUrl: updatedUser.avatarUrl
+    });
+
+  } catch (err) {
+    console.error('💥 Ошибка при смене фото профиля:', err);
+    res.status(500).json({
+      status: 'error',
+      message: 'Ошибка сервера при загрузке аватара'
+    });
+  }
+
+  console.log('🖼🖼🖼 === СМЕНА ФОТО ПРОФИЛЯ ЗАВЕРШЕНА ===\n');
+};
 
 module.exports = {
     sendPasswordResetCode,
@@ -342,4 +435,6 @@ module.exports = {
     resendPasswordResetCode,
 
     updateUserField,
+
+    changeUserPhoto
 }

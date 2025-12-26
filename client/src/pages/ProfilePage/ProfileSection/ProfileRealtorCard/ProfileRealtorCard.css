@@ -1,0 +1,55 @@
+.user-realtor-info{
+    background-color: black;
+    border-radius: 25px;
+    margin-top: 100px;
+    padding: 30px;
+
+    max-width: 1000px;
+}
+
+.user-realtor-info p{
+    font-size: 30px;
+    font-weight: 600;
+    color: white;
+}
+
+.user-realtor-info_form-edit{
+    margin-top: 10px;
+    max-width: 100%;
+}
+
+
+.realtor-info_edit--lable{
+    color: white;
+}
+
+.realtor-info_edit--input{
+    background: none;
+    border: none;
+
+    margin-left: 10px;
+
+    color: white;
+}
+
+.realtor-info_edit--text-area{
+    width: 100%;
+    
+    background: none;
+    border: none;
+    resize: none;
+
+
+    color: white;
+}
+
+.realtor-info_change-save-button{
+    width: 80%;
+    background-color: white;
+    border-radius: 30px;
+    color: black;
+    padding: 20px;
+    
+    font-size: 20px;
+    font-weight: 600;
+}
