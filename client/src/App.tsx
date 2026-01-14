@@ -18,6 +18,7 @@ import ListingPage from './pages/ListingPages/ListingPage/ListingPage';
 import ListingsMyPage from './pages/ListingsPages/ListingsMyPage/ListingsMyPages';
 import RealtorsPage from './pages/RealtorsPage/RealtorsPage';
 import ListingsPage from './pages/ListingsPages/ListingsPage/ListingsPage';
+import ChatPage from './pages/ChatPage/ChatPage';
 
 
 
@@ -48,6 +49,7 @@ function App() {
 
               <Route path="/realtors" element={<RealtorsPage/>} />
 
+              <Route path="/chat" element={<ChatPage/>} />
             </Route>
 
           <Route element={<RealtorLayout/>}>

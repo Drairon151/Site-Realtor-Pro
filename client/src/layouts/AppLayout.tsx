@@ -5,7 +5,7 @@ import './AppLayout.css'
 import { useUserContext } from '../context/UserContext';
 
 export default function AppLayout() {
-  
+
   const { 
       userAuthorized, 
       userLoading,
@@ -22,7 +22,8 @@ export default function AppLayout() {
   return (
     <div className="app-layout">
       <Sidebar />
-      <main className="app-main">
+
+      <main className={`app-main`}>
         <Outlet />
       </main>
     </div>

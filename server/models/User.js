@@ -33,6 +33,11 @@ const userSchema = new mongoose.Schema({
     enum: ['client', 'realtor'],
     default: 'client',
   },
+    chatIds: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Chat',
+    default: [],
+  }],
   avatarUrl: {
     type: String,
     default: null

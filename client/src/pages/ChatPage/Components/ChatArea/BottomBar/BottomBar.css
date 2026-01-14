@@ -1,0 +1,33 @@
+.bottom-bar{
+
+    min-height: 50px;
+    width: 100%;
+
+    background-color: white;
+    
+    gap: 8px;
+}
+
+.bottom-bar_user-input{
+    height: 60px;
+    width: 75%;
+    padding: 20px;
+    margin: 0px 0px 20px 20px;
+    resize:none;
+
+    background-color: black;
+    border-radius: 40px;
+
+    color: white;
+    line-height: 1.5;
+
+}
+
+.bottom-bar_send-message-button{
+    margin-right: 50px;
+    height: 100px;
+}
+
+.send-message-button_icon{
+    height: 100%;
+}

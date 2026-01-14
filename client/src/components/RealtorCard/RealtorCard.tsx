@@ -3,12 +3,18 @@ import './RealtorCard.css'
 import {Realtor} from '../../types/realtor'
 
 import plug from '../../assets/img/icons/plug.png'
+import useMessanger from '../../hooks/useMessanger'
 
 interface RealtorCard{
     realtor:Realtor
 } 
 
 export default function RealtorCard({realtor}:RealtorCard){
+    
+    const {
+        createNewChat,
+    } = useMessanger()
+
     return (
 
         <div
@@ -65,6 +71,7 @@ export default function RealtorCard({realtor}:RealtorCard){
                 >Узнать номер</button>
 
                 <button
+                    onClick={()=>createNewChat(realtor.userId)}
                     className='realtor-card_button realtor-card_button--writeSeller'
                 >Написать</button>
 

@@ -1,0 +1,15 @@
+.chat-area{
+    width: 100%;
+    height: calc(100vh - 100px);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-area_messages{
+    flex: 1;
+    overflow-y: auto;
+
+    background-color: black;
+    border-radius: 50px;
+    margin: 50px;
+}

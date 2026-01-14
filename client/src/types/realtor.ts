@@ -3,6 +3,9 @@ export interface Realtor {
     surname: string,
     patronymic: string,
 
+    _id: string,
+    userId: string,
+
     numberPhone: string,
 
     successfulTransactions: number,

@@ -18,7 +18,7 @@ export default function Sidebar(){
 
     menuItems.push(
         { label: 'Профиль', path: '/profile' },
-        { label: 'Чаты', path: '/chats' },
+        { label: 'Чаты', path: '/chat' },
         { label: 'Объявления', path: '/listings' },
         { label: 'Риелторы', path: '/realtors'}
     );
@@ -27,7 +27,6 @@ export default function Sidebar(){
         menuItems.push(
             { label: 'Создать обьявление', path: '/listing/new' },
             { label: 'Мои объявления', path: '/listings/my' },
-            { label: 'Отзывы', path: '/reviews' },
         );
     }
 

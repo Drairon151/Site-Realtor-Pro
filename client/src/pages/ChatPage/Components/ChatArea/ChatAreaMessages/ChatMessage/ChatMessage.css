@@ -1,0 +1,22 @@
+.chat-message{
+    padding: 5px;
+    margin: 10px;
+    background-color: white;
+    border-radius: 25px;
+}
+
+.chat-message:first-child{
+    margin-top: 20px;
+}
+
+.chat-message_user-photo{
+    height: 30px;
+}
+
+.chat-message_text{
+    font-size: 15px;
+}
+
+.chat-message_time-stamp{
+    font-size: 10px;
+}
