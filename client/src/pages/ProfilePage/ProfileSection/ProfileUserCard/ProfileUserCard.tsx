@@ -1,5 +1,4 @@
 import './ProfileUserCard.css'
-import plug from '../../../../assets/img/icons/plug.png'
 import Modal from '../../../../components/Modal/Modal'
 import ChangePasswordForm from '../ProfileComponents/ChangePasswordForm/ChangePasswordForm'
 import ChangeUserPhotoForm from '../ProfileComponents/ChangeUserPhotoForm/ChangeUserPhotoForm'
@@ -8,6 +7,8 @@ import { useEffect, useState } from 'react'
 import { User } from '../../../../types/user'
 
 import avatarChangeIcon from '../../../../assets/img/icons/edit-pen.svg'
+import userAvatarPlug from '../../../../assets/img/icons/userAvatarPlug.svg'
+import numberPhoneValidator from '../../../../utils/numberPhoneValidator'
 
 interface ProfileUserCardProps{
     user: User,
@@ -28,16 +29,26 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
     const [userAvatarClick,setUserAvatarClick] = useState(false)
 
     useEffect(() => {
-        setEditUser(user);
+        setEditUser({...user,['numberPhone']:numberPhoneValidator(user.numberPhone)});
     }, [user]); 
 
-    
+    const [userAvatar, setUserAvatar] = useState(
+        
+        user.avatarUrl ?? userAvatarPlug
+        
+    )
+
+    const userAvatarLoadErrorHandler = ()=>{
+        setUserAvatar(userAvatarPlug)
+    }
+
 
 
     function editUserChange(event: React.ChangeEvent<HTMLInputElement>){
 
         const allowedFields = ['name', 'surname', 'patronymic', '_id', 'role', 'mail', 'numberPhone'] as const;
         type StringField = typeof allowedFields[number];
+        
 
 
         const isStringField = (key: string): key is StringField => {
@@ -51,7 +62,11 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
             const update = {...prev}
             
             if(isStringField(name)){
-                update[name] = value
+                if(name == 'numberPhone'){
+                    update[name] = numberPhoneValidator(value)
+                }else{
+                    update[name] = value
+                }
             }
             return update
         })
@@ -67,7 +82,7 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
         }
     }
 
-    function handleRadioChangeSave(event:React.MouseEvent<HTMLInputElement>){
+    function handleRadioChangeSave(event: React.ChangeEvent<HTMLInputElement>){
         const value = event.currentTarget.value;
 
         setEditUser(prev=>({
@@ -94,9 +109,10 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                         <img 
                             className={`user-basic-info_avatar--img  ${userAvatarOver?'active':null}`} 
                             src={
-                                user.avatarUrl
-                                ?user.avatarUrl
-                                :plug
+                                userAvatar
+                            }
+                            onError={
+                                userAvatarLoadErrorHandler
                             }
                         />
 
@@ -197,7 +213,7 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
 
                     {
                         user!.role=='admin' ? (
-                            <p style={{color: 'white'}}>ВЫ АДМИН</p>
+                            <p style={{color: 'white'}}>АДМИНИСТРАТОР</p>
                         ):(
                             <div className='user-contact-info_item'>
 
@@ -211,7 +227,7 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                                     type='radio' 
                                     value='client'
                                     checked={editUser.role === 'client'}
-                                    onClick={handleRadioChangeSave}
+                                    onChange={handleRadioChangeSave}
                                 ></input>
 
                                 <label className='user-contact-info_item--lable' htmlFor='user-contact-info_item--realtor'>
@@ -224,7 +240,7 @@ export default function ProfileUserCard({user, updateUserField, sendVerifyCodeCh
                                     type='radio' 
                                     value='realtor'
                                     checked={editUser.role === 'realtor'}
-                                    onClick={handleRadioChangeSave}
+                                    onChange={handleRadioChangeSave}
                                 ></input>
                             </div>
                         )

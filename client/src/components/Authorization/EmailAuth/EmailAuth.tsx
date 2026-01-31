@@ -2,8 +2,8 @@ import './EmailAuth.css'
 import { EmailStatus } from '../../../types/emailStatus'
 interface EmailAuthProps{
     cooldownTimer: number, 
-    verifyEmail:(event: React.FormEvent<HTMLFormElement>)=>{} , 
-    resendVerification: (event: React.MouseEvent<HTMLButtonElement>) => {}, 
+    verifyEmail:(event: React.FormEvent<HTMLFormElement>)=>void , 
+    resendVerification: (event: React.MouseEvent<HTMLButtonElement>) => void, 
     emailAuthStatus:EmailStatus,
 }
 

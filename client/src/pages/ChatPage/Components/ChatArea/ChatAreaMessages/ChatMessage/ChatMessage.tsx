@@ -1,19 +1,30 @@
 import { Message } from '../../../../../../types/messager/message'
 import './ChatMessage.css'
 
+import userAvatarPlug from '../../../../../../assets/img/icons/userAvatarPlug.svg'
+import { useState } from 'react'
+
 interface ChatMessage{
     message:Message,
     avatarUrl:string,
 }
 
 export default function ChatMessage({message,avatarUrl}:ChatMessage){
+
+    const [userAvatar, setUserAvatar] = useState(avatarUrl)
+
+    const photoLoadErrorHandler = ()=>{
+        setUserAvatar(userAvatarPlug)
+    }
+
     return (
         <div
             className='chat-message flex'
         >
             <img
                 className='chat-message_user-photo'
-                src={avatarUrl}
+                src={userAvatar}
+                onError={photoLoadErrorHandler}
             />
 
             <div
@@ -25,7 +36,7 @@ export default function ChatMessage({message,avatarUrl}:ChatMessage){
                 >
 
                     <p
-                        className='chat-message_time-stamp'
+                        className='chat-message_user-name'
                     >{`${message.userName}`}</p>
 
                     <p

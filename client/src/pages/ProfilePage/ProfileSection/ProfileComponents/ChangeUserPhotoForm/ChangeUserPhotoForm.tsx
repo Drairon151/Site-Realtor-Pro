@@ -1,10 +1,10 @@
 import React, {useRef, useState} from 'react';
 
-import useUser from "../../../../../hooks/useUser"
 import './ChangeUserPhotoForm.css'
 
 import loadPhotoIcon from '../../../../../assets/img/icons/galleryIcon.svg'
 import makePhotoIcon from '../../../../../assets/img/icons/photoCameraLogo.svg'
+import { useUserContext } from '../../../../../context/UserContext';
 
 interface ChangePasswordForm{
     onClose: ()=>void,
@@ -13,7 +13,7 @@ interface ChangePasswordForm{
 export default function ChangePasswordForm({onClose}:ChangePasswordForm){
     const{
         changeUserPhoto,
-    }=useUser()
+    }=useUserContext()
 
     const loadPhotoRef = useRef<HTMLInputElement>(null)
     const [photoLoaded,setPhotoLoaded] = useState<null|FileList>(null)

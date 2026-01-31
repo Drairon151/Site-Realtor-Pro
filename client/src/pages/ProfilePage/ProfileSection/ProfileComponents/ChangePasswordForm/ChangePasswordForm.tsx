@@ -1,5 +1,5 @@
 import EmailAuth from "../../../../../components/Authorization/EmailAuth/EmailAuth"
-import useUser from "../../../../../hooks/useUser"
+import { useUserContext } from "../../../../../context/UserContext"
 import './ChangePasswordForm.css'
 
 interface ChangePasswordForm{
@@ -10,11 +10,12 @@ export default function ChangePasswordForm({onClose}:ChangePasswordForm){
     const{
         cooldownTimer,
         emailVerificationStatus,
+        changePasswordStatus,
 
         verifyCodeChangePassword,
         resendVerifyCodeChangePassword,
         changePassword,
-    }=useUser()
+    }=useUserContext()
 
     return(
 
@@ -30,13 +31,36 @@ export default function ChangePasswordForm({onClose}:ChangePasswordForm){
                 />
             ):emailVerificationStatus.status === 'code-success' ?(
                 <form onSubmit={changePassword} className="form change-password-form">
-                    <label className="form_lable change-password-form_lable" htmlFor="oldPassword">Ваш актуальный пароль</label>
-                    <input className="form_input change-password-form_input" name="oldPassword" type="password"></input>
+                    {
+                        changePasswordStatus?.status == 'success'
+                        ?
+                            <p
+                                className='change-password-form_status--success'
+                            >
+                                Пароль успешно обновлён
+                            </p>
+                        :
+                        <>
+                            <label className="form_lable change-password-form_lable" htmlFor="oldPassword">Ваш актуальный пароль</label>
+                            <input className="form_input change-password-form_input" name="oldPassword" type="password"></input>
 
-                    <label className="form_lable change-password-form_lable" htmlFor="newPassword">Ваш новый пароль</label>
-                    <input className="form_input change-password-form_input" name="newPassword" type="password"></input>
+                                {
+                                    !changePasswordStatus
+                                    ?null
+                                    :
+                                    <p
+                                        className='change-password-form_status'
+                                    >
+                                        {changePasswordStatus.message}
+                                    </p>
+                                }
 
-                    <button className="form_button change-password-form_button" type="submit">Подтвердить</button>
+                            <label className="form_lable change-password-form_lable" htmlFor="newPassword">Ваш новый пароль</label>
+                            <input className="form_input change-password-form_input" name="newPassword" type="password"></input>
+
+                            <button className="form_button change-password-form_button" type="submit">Подтвердить</button>
+                        </>
+                    }
                 </form>
             ):(null)
         }

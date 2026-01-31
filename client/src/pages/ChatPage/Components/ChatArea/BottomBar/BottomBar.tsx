@@ -31,7 +31,17 @@ export default function BottomBar({currentChat, sendMessage}:BottomBar){
                 
                 value={userInput}
                 onChange={event=>setUserInput(event.currentTarget.value)}
-            >
+                onKeyDown={
+                    currentChat
+                    ?event=>{
+                        if (event.key === 'Enter') {
+                            sendMessage(userInput, currentChat.chat_id)
+                            setUserInput('')
+                        }
+                    }
+                    :()=>{}
+                }
+                >
 
             </textarea>
 

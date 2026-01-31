@@ -18,7 +18,7 @@ export default function Header(){
                 <p className="header_logo-text">Риэлтор профи</p>
             </button>
 
-                <Authorization/>
+            <Authorization/>
             
 
         </header>

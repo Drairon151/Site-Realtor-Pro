@@ -349,6 +349,7 @@ function logout(req, res) {
 }
 
 module.exports = {
+  generateToken,
   register,
   login,
   verifyEmail,

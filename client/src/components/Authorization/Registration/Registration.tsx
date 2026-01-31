@@ -1,9 +1,12 @@
+import { useState } from "react"
+import numberPhoneValidator from "../../../utils/numberPhoneValidator"
+
 interface RegistrationProps{
     registration: (event: React.FormEvent<HTMLFormElement>)=>{}
 }
 
 export default function Registration({registration}:RegistrationProps){
-    
+    const [numberPhoneInput, setNumberPhoneInput] = useState('')
     return(
 
             <form className="form center" onSubmit={registration}>
@@ -18,7 +21,19 @@ export default function Registration({registration}:RegistrationProps){
                 <input name="mail" className="form_input" type="email"></input>
 
                 <label className="form_lable">Номер телефона:</label>
-                <input name="numberPhone" className="form_input" type="text"></input>
+                <input 
+                    name="numberPhone" 
+                    className="form_input" 
+                    type="text"
+                    value={numberPhoneInput}
+
+                    onChange={event=>{
+                        setNumberPhoneInput(
+                            numberPhoneValidator(event.currentTarget.value)
+                        )
+                    }}
+                    placeholder="+7 (999) 123-45-67"
+                ></input>
 
                 
                 <p>Кто вы?</p>

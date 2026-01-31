@@ -7,14 +7,12 @@
 }
 
 .create-listing-form_input{
-    width: 100%;
     border-radius: 5px;
     border: 2px solid black;
 
 }
 
 .create-listing-form_textarea{
-    width: 100%;
 
     border-radius: 5px;
     border: 2px solid black;

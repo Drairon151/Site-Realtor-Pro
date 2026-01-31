@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, Dispatch, FormEvent, SetStateAction, useContext } from "react";
 import useUser from "../hooks/useUser";
 import { User } from "../types/user";
 
@@ -7,19 +7,102 @@ interface UserProviderProps{
 }
 
 export interface UserContextValue {
-    user: User | null;
-    setUser: React.Dispatch<React.SetStateAction<User | null>>;
-    userLoading: boolean,
-    userAuthorized: boolean | null,
+    user : User | null,
+    setUser: React.Dispatch<React.SetStateAction<User | null>>,
+    checkAuth : ()=>{},
+    
+    cooldownTimer : number,
+    setCooldownTimer : Dispatch<SetStateAction<number>>,
+
+    isLoading : boolean,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+
+    emailVerificationStatus : {
+        status: string,
+        type: string,
+    },
+    
+    changePassword : (event: FormEvent<HTMLFormElement>)=>void,
+    changePasswordStatus: {
+        status: string,
+        type:string, 
+        message:string
+    } | null,
+    verifyCodeChangePassword : (event: FormEvent<HTMLFormElement>)=>void,
+    sendVerifyCodeChangePassword : ()=>void,
+    resendVerifyCodeChangePassword : (event: React.MouseEvent<HTMLButtonElement>)=>void,
+
+    updateUserField : (name: string, value: string)=>void,
+    
+    userLoading : boolean,
+    userAuthorized : boolean,
+    setUserAuthorized: React.Dispatch<React.SetStateAction<boolean>>,
+
+    changeUserPhoto : (newPhoto: FileList)=>void,
 }
 
 const UserContext = createContext<UserContextValue|undefined>(undefined);
 
 export const UserProvider = ({children}:UserProviderProps)=>{
-    const {user, userLoading, userAuthorized, setUser} = useUser()
+    const {
+        user,
+        setUser,
+        checkAuth,
+        
+        cooldownTimer,
+        setCooldownTimer,
+
+        isLoading,
+        setIsLoading,
+
+        emailVerificationStatus,
+        
+        changePassword,
+        changePasswordStatus,
+        verifyCodeChangePassword,
+        sendVerifyCodeChangePassword,
+        resendVerifyCodeChangePassword,
+
+        updateUserField,
+        
+        userLoading,
+        userAuthorized,
+        setUserAuthorized,
+
+        changeUserPhoto,
+    } = useUser()
 
     return(
-        <UserContext.Provider value={{user, userLoading, userAuthorized, setUser}}>
+        <UserContext.Provider value={
+            {
+                user,
+                setUser,
+                checkAuth,
+                
+                cooldownTimer,
+                setCooldownTimer,
+
+                isLoading,
+                setIsLoading,
+
+
+                emailVerificationStatus,
+                
+                changePassword,
+                changePasswordStatus,
+                verifyCodeChangePassword,
+                sendVerifyCodeChangePassword,
+                resendVerifyCodeChangePassword,
+
+                updateUserField,
+                
+                userLoading,
+                userAuthorized,
+                setUserAuthorized,
+
+                changeUserPhoto,
+            }
+        }>
             {children}
         </UserContext.Provider>
     )

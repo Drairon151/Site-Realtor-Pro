@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import useUser from '../../hooks/useUser';
 import './Sidebar.css'
+import { useUserContext } from '../../context/UserContext';
 
 export default function Sidebar(){
     const {
         user,
         isLoading,
-    } = useUser()
+    } = useUserContext()
 
     const navigate = useNavigate()
 

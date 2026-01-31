@@ -1,7 +1,7 @@
-// server/websocket/handlers.js
 const Chat = require('../models/Chat');
 const User = require('../models/User');
-const { getAllClients, removeClient } = require('./clients');
+const { getAllClients } = require('./clients');
+const WebSocket = require('ws'); // Убедись, что импортирован
 
 const handleWebSocketMessage = async (ws, data) => {
   try {
@@ -23,10 +23,15 @@ const handleWebSocketMessage = async (ws, data) => {
         return ws.send(JSON.stringify({ type: 'error', message: 'Chat not found' }));
       }
 
-      const isParticipant = chat.participants
-        .filter(id => id != null)
-        .some(id => id.toString() === ws.userId);
+      const participantIds = [
+        chat.participant1,
+        chat.participant2
+      ]
+      .filter(id => id != null)
+      .map(id => String(id));
 
+
+      const isParticipant = participantIds.includes(ws.userId);
       if (!isParticipant) {
         console.warn(`[WS MSG] ❌ Пользователь ${ws.userId} не участник чата ${chatId}`);
         return ws.send(JSON.stringify({ type: 'error', message: 'Chat access denied' }));
@@ -42,32 +47,27 @@ const handleWebSocketMessage = async (ws, data) => {
       await chat.save();
 
       const lastMessage = chat.messages[chat.messages.length - 1];
-// После сохранения чата и получения lastMessage:
 
-// 🔑 Загружаем данные ОТПРАВИТЕЛЯ (он же ws.userId)
+      // Загружаем данные отправителя
       const senderUser = await User.findById(ws.userId).select('name surname');
       const userName = senderUser 
-        ? senderUser.name 
+        ? `${senderUser.name} ${senderUser.surname}`.trim()
         : 'Пользователь';
 
       const messageDto = {
-        messageId: lastMessage._id.toString(),
+        messageId: String(lastMessage._id),
         text: lastMessage.text,
-        userID: lastMessage.sender.toString(),
+        userID: String(lastMessage.sender),
         userName: userName,
-        timeStamp: lastMessage.timestamp.toISOString(), // ← строка в формате ISO 8601
+        timeStamp: lastMessage.timestamp.toISOString(),
       };
 
       // Отправка отправителю
       ws.send(JSON.stringify({ type: 'message:created', chatId, message: messageDto }));
       console.log(`[WS MSG] Отправлено подтверждение отправителю ${ws.userId}`);
 
-      // Отправка получателю
-      const recipientId = chat.participants
-        .filter(id => id != null)
-        .map(id => id.toString())
-        .find(id => id !== ws.userId);
-
+      // 🔑 ИСПРАВЛЕНО: определение получателя
+      const recipientId = participantIds.find(id => id !== ws.userId);
       const recipientWs = getAllClients().get(recipientId);
       if (recipientWs?.readyState === WebSocket.OPEN) {
         recipientWs.send(JSON.stringify({ type: 'message:created', chatId, message: messageDto }));
@@ -98,7 +98,7 @@ const handleWebSocketConnection = (ws) => {
 
   ws.on('close', () => {
     console.log(`[WS CONN] 🔴 Соединение закрыто для: ${ws.userId}`);
-    removeClient(ws.userId); // ← используем clients.js
+    // removeClient вызывается в clients.js — убедись, что он там есть
   });
 
   ws.on('error', (err) => {

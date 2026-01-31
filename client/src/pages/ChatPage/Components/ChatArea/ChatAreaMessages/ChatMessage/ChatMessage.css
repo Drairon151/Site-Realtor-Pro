@@ -3,6 +3,8 @@
     margin: 10px;
     background-color: white;
     border-radius: 25px;
+
+    font-size: 10px;
 }
 
 .chat-message:first-child{
@@ -17,6 +19,10 @@
     font-size: 15px;
 }
 
+.chat-message_user-name{
+    margin-right: 10px;
+}
+
 .chat-message_time-stamp{
-    font-size: 10px;
+    
 }

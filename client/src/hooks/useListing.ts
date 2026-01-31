@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Listing } from "../types/listing";
+import numberPhoneValidator from "../utils/numberPhoneValidator";
 
 export default function useListing() {
     const API_LISTING: string = 'http://localhost:5000/api/listing';
@@ -59,7 +60,7 @@ export default function useListing() {
             }
             
             const result = await response.json();
-            setListingAuthorPhone(result.phone)
+            setListingAuthorPhone(numberPhoneValidator(result.phone))
 
         } catch (error) {
             setListingAuthorPhone(null)

@@ -1,4 +1,4 @@
-import { UserChatData } from '../../../../types/messager/UserChatData'
+import { UserChatData } from '../../../../types/messager/userChatData'
 import userChatInfo from '../../../../types/messager/userChatInfo'
 import BottomBar from './BottomBar/BottomBar'
 import './ChatArea.css'

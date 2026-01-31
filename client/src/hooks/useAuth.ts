@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, FormEvent  } from "react";
 import { useUserContext } from '../context/UserContext';
 import {User} from "../types/user"
-import useUser from './useUser';
 
 export default function useAuth(){
     interface EmailAuthStatus{
@@ -14,14 +13,12 @@ export default function useAuth(){
     const {
         user,
         setUser,
-    } = useUserContext();
-
-    const {
         cooldownTimer,
         setIsLoading,
         setCooldownTimer,
         setUserAuthorized,
-    } = useUser()
+    } = useUserContext();
+
     const [emailAuthStatus, setEmailAuthStatus] = useState<EmailAuthStatus>({
         status:'',
         type:'',
@@ -56,7 +53,7 @@ export default function useAuth(){
             patronymic: formData.get('patronymic'),
 
             mail: formData.get('mail'),
-            numberPhone: formData.get('numberPhone'),
+            numberPhone: String(formData.get('numberPhone')).replace(/\D/g, ''),
             password: formData.get('password'),
             role: formData.get('role'),
             isDiplomaVerified: false,
@@ -134,7 +131,7 @@ export default function useAuth(){
                 }
 
             const result = await response.json()
-            navigate('/profile', { replace: true });
+            window.location.href = '/profile';
             
             setUserAuthorized(true)
             setUser({...userData, ...result.user})

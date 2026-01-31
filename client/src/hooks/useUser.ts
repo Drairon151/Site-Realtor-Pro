@@ -21,6 +21,12 @@ export default function useUser(){
         updatedValue: string,
     }
 
+    interface changePasswordStatus{
+        status: string,
+        type:string, 
+        message:string
+      }
+
     const [user, setUser] = useState<User | null>(null)
 
     const [emailVerificationStatus, setEmailVerificationStatus] = useState<EmailVerificationStatus>({
@@ -34,52 +40,56 @@ export default function useUser(){
     const [userAuthorized, setUserAuthorized] = useState<boolean>(false)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [userLoading, setUserLoading] = useState<boolean>(false);
+    const [changePasswordStatus, setChangePasswordStatus] = useState<changePasswordStatus|null>(null)
+
     
-    useEffect(()=>{
-        const checkAuth = async () => {
-            setUserLoading(true)
-            setUserAuthorized(false)
+    const checkAuth = async () => {
+        setUserLoading(true)
+        setUserAuthorized(false)
 
-            try {
+        try {
 
-                const response = await fetch('http://localhost:5000/api/me', {
-                    method: 'GET',
-                    credentials: 'include',
-                });
+            const response = await fetch('http://localhost:5000/api/me', {
+                method: 'GET',
+                credentials: 'include',
+            });
 
-                if (!response.ok) {
+            if (!response.ok) {
 
-                    try{
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Ошибка проверки авторизации')
-                    }catch{
-                        throw new Error(`HTTP ${response.status} ${response.statusText}`)
-
-                    }
+                try{
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка проверки авторизации')
+                }catch{
+                    throw new Error(`HTTP ${response.status} ${response.statusText}`)
 
                 }
-
-                const result = await response.json() as MeResponse;
-                setUserAuthorized(true)
-                setUser(result.user);
-            }catch(error){
-                if (error instanceof Error) {
-                    console.log(error.message);
-                } else {
-                    console.log('Ошибка:', error);
-                }
-                setUserAuthorized(false)
-
-            }finally{
-                setUserLoading(false)
 
             }
-        };
+
+            const result = await response.json() as MeResponse;
+            setUserAuthorized(true)
+            // console.log('Успешная авторизацию ', result.user)
+            setUser(result.user);
+        }catch(error){
+            if (error instanceof Error) {
+                console.log(error.message);
+            } else {
+                console.log('Ошибка:', error);
+            }
+            setUserAuthorized(false)
+
+        }finally{
+            setUserLoading(false)
+
+        }
+    };
+
+    useEffect(()=>{
 
         checkAuth()
     
     },[])
-    
+
     const verifyCodeChangePassword = async(event: FormEvent<HTMLFormElement>) =>{
         event.preventDefault()
         
@@ -160,18 +170,23 @@ export default function useUser(){
                 credentials: 'include',
             });
 
-                if (!response.ok) {
+            if (!response.ok) {
 
-                    try{
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Ошибка смены пароля')
-                    }catch{
-                        throw new Error(`HTTP ${response.status} ${response.statusText}`)
+                try{
+                    const errorData = await response.json();
+                    setChangePasswordStatus(errorData)
 
-                    }
+                    throw new Error(errorData.message || 'Ошибка смены пароля')
+                }catch{
+                    throw new Error(`HTTP ${response.status} ${response.statusText}`)
 
                 }
-            navigate('/ProfilePage', { replace: true });
+
+            }
+
+            setChangePasswordStatus(null)
+            console.log('Пароль успешно обновлён')
+            navigate('/', { replace: true });
 
         }catch(error){
             if (error instanceof Error) {
@@ -313,6 +328,10 @@ export default function useUser(){
                 } as User;
             });
 
+            console.log('Обновлённые данные ',result.updatedField,' : ',result.updatedValue)
+
+
+
             }catch(error){
                 if (error instanceof Error) {
                     console.log(error.message);
@@ -357,6 +376,7 @@ export default function useUser(){
     return {
         user,
         setUser,
+        checkAuth,
         
         cooldownTimer,
         setCooldownTimer,
@@ -367,6 +387,7 @@ export default function useUser(){
         emailVerificationStatus,
         
         changePassword,
+        changePasswordStatus,
         verifyCodeChangePassword,
         sendVerifyCodeChangePassword,
         resendVerifyCodeChangePassword,
@@ -374,7 +395,7 @@ export default function useUser(){
         updateUserField,
         
         userLoading,
-        userAuthorized, 
+        userAuthorized,
         setUserAuthorized,
 
         changeUserPhoto,

@@ -112,6 +112,7 @@ const createListing = async (req, res) => {
 };
 
 // Получение одного объявления по ID
+// Получение одного объявления по ID
 const getListingById = async (req, res) => {
   const { id } = req.params;
 
@@ -124,7 +125,7 @@ const getListingById = async (req, res) => {
 
   try {
     const listing = await Listing.findById(id)
-      .populate('author', 'name surname role isDiplomaVerified');
+      .populate('author', 'name surname role isDiplomaVerified'); // author — это User
 
     if (!listing) {
       return res.status(404).json({
@@ -133,7 +134,6 @@ const getListingById = async (req, res) => {
       });
     }
 
-    // Формируем ответ в том же формате, что и /listings/my
     const listingData = {
       _id: listing._id,
       title: listing.title,
@@ -143,7 +143,9 @@ const getListingById = async (req, res) => {
       specs: listing.specs,
       description: listing.description,
       images: listing.images,
-      createdAt: listing.createdAt // ← добавлено
+      createdAt: listing.createdAt,
+      // 🔑 Добавляем realtor_id — это _id автора (он же риелтор)
+      realtor_id: listing.author?._id?.toString() || null,
     };
 
     res.json({

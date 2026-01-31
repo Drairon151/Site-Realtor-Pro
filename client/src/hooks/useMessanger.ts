@@ -164,7 +164,7 @@ export default function useMessanger(){
     const changeCurrentChat = (newChat:userChatInfo)=>{
         setChatSearchParams(prev=>{
             const next = new URLSearchParams(prev);
-            next.set('chatId', String(newChat.chat_id));
+            next.set('chatId', newChat.chat_id);
             return next;
         })
         setCurrentChat({...newChat})
@@ -174,10 +174,10 @@ export default function useMessanger(){
 
     const getChatData = async (chatId:string)=>{
         try{
-            console.log('Запрашиваем данные чатов')
+            console.log('Запрашиваем данные чатов, chatId: ',chatId)
             const params = new URLSearchParams();
             if (currentChatParams.chatId) params.append('chatId', currentChatParams.chatId);
-
+            console.log('params равен: ', params)
             const response = await fetch(`${API_MESSAGER}/getChatData?${params}`,{
                 method: 'GET',
                 credentials: 'include',
@@ -206,13 +206,16 @@ export default function useMessanger(){
     }
 
     useEffect(()=>{
-        if(!currentChat)return
-        if(currentChat.chat_id in chatsMessages){
+        if(!currentChat || !currentChatParams.chatId){
+            console.log('Не выбран чат')
+            return
+        }else if(currentChat.chat_id in chatsMessages){
+            console.log('Не правильный id')
             return
         }else{
             getChatData(currentChat.chat_id)
         }
-    },[currentChat])
+    },[chatSearchParams])
 
     useEffect(() => {
         startConnection();
@@ -230,7 +233,6 @@ export default function useMessanger(){
         createNewChat,
         
         getChatsInfo,
-        getChatData,
         
         sendMessage,
 

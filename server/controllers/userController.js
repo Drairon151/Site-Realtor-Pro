@@ -1,6 +1,11 @@
 const express = require('express');
 const User = require('../models/User');
 const router = express.Router();
+const crypto = require('crypto');
+
+const bcrypt = require('bcrypt');
+const { generateToken } = require('../controllers/authController');
+const { sendVerificationEmail } = require('../utils/emailService'); // ← ад
 
 // --- СМЕНА ПАРОЛЯ ---
 const changePassword = async (req, res) => {

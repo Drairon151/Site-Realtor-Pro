@@ -8,7 +8,6 @@ export default function ChatPage(){
 
     const {
         getChatsInfo,
-        getChatData,
         changeCurrentChat,
         sendMessage,
         

@@ -13,8 +13,12 @@ exports.getChatsInfo = async (req, res) => {
       .populate({
         path: 'chatIds',
         populate: [
-          { path: 'participants', select: 'name surname avatarUrl' },
-          { path: 'messages', options: { sort: { timestamp: -1 }, limit: 1 } }
+          { path: 'participant1', select: 'name surname avatarUrl' },
+          { path: 'participant2', select: 'name surname avatarUrl' },
+          { 
+            path: 'messages', 
+            options: { sort: { timestamp: -1 }, limit: 1 } 
+          }
         ],
         options: { sort: { updatedAt: -1 } }
       });
@@ -27,12 +31,22 @@ exports.getChatsInfo = async (req, res) => {
     console.log('✅ [getChatsInfo] Найдено чатов у пользователя:', user.chatIds?.length || 0);
 
     const chats = user.chatIds || [];
-
     const result = chats.map(chat => {
       console.log('🔍 [getChatsInfo] Обработка чата:', chat._id.toString());
-      const other = chat.participants.find(p => !p._id.equals(req.user._id));
+
+      // Определяем собеседника: кто не является текущим пользователем
+      let other = null;
+      const userIdStr = req.user._id.toString();
+
+      if (chat.participant1?._id.toString() === userIdStr) {
+        other = chat.participant2;
+      } else if (chat.participant2?._id.toString() === userIdStr) {
+        other = chat.participant1;
+      }
+
       if (!other) {
         console.warn('⚠️ [getChatsInfo] Не найден собеседник в чате:', chat._id.toString());
+        other = { name: 'Unknown', surname: '', avatarUrl: null };
       }
 
       const lastMessage = chat.messages.length ? chat.messages[0] : null;
@@ -41,9 +55,9 @@ exports.getChatsInfo = async (req, res) => {
       }
 
       return {
-        name: `${other?.name || 'Unknown'} ${other?.surname || ''}`,
+        name: `${other.name || 'Unknown'} ${other.surname || ''}`.trim() || 'Unknown',
         chat_id: chat._id.toString(),
-        avatar_url: other?.avatarUrl || '/default-avatar.png',
+        avatar_url: other.avatarUrl || '/default-avatar.png',
         lastMessage: lastMessage
           ? { text: lastMessage.text, timestamp: lastMessage.timestamp }
           : null,
@@ -57,7 +71,6 @@ exports.getChatsInfo = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
-
 // GET /api/messager/getChatData?chatId=...
 exports.getChatData = async (req, res) => {
   console.log('🔍 [getChatData] Запрос данных чата');
@@ -70,9 +83,10 @@ exports.getChatData = async (req, res) => {
       return res.status(400).json({ error: 'chatId required' });
     }
 
-    const chat = await Chat
-      .findById(chatId)
-      .populate('participants', 'name surname')
+    // Находим чат и загружаем участников и сообщения
+    const chat = await Chat.findById(chatId)
+      .populate('participant1', 'name surname')
+      .populate('participant2', 'name surname')
       .populate('messages.sender', 'name surname');
 
     if (!chat) {
@@ -80,38 +94,50 @@ exports.getChatData = async (req, res) => {
       return res.status(404).json({ error: 'Chat not found' });
     }
 
-    console.log('🔍 [getChatData] Участники чата:', chat.participants.map(p => p._id.toString()));
-    const hasAccess = chat.participants.some(p => p._id.equals(req.user._id));
-    if (!hasAccess) {
+    // Проверка доступа: текущий пользователь должен быть одним из участников
+    const userIdStr = req.user._id.toString();
+    const isParticipant =
+      chat.participant1?._id.toString() === userIdStr ||
+      chat.participant2?._id.toString() === userIdStr;
+
+    if (!isParticipant) {
       console.warn('🔒 [getChatData] Доступ запрещён. Пользователь не в чате:', req.user._id);
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    const other = chat.participants.find(p => !p._id.equals(req.user._id));
+    // Определяем собеседника
+    const other =
+      chat.participant1?._id.toString() === userIdStr
+        ? chat.participant2
+        : chat.participant1;
+
     if (!other) {
       console.warn('⚠️ [getChatData] Не удалось определить собеседника в чате:', chatId);
     }
 
+    // Формируем историю сообщений
     const chatHistory = chat.messages.map(msg => ({
       userName: msg.sender?.name || 'Unknown',
       userID: msg.sender?._id.toString() || null,
-      messageId: msg._id.toString(),
+      messageId: String(msg._id),
       text: msg.text,
       timeStamp: msg.timestamp,
     }));
 
     console.log('✅ [getChatData] Подготовлено сообщений:', chatHistory.length);
+
+    // Формат ответа совместим с фронтендом
     res.json({
       [chatId]: {
         chatData: {
           users: {
             [other?._id.toString() || 'unknown']: {
               userName: `${other?.name || ''} ${other?.surname || ''}`.trim() || 'Unknown',
-            }
-          }
+            },
+          },
         },
         chatHistory,
-      }
+      },
     });
   } catch (err) {
     console.error('❌ [getChatData] Ошибка:', err);
@@ -119,92 +145,61 @@ exports.getChatData = async (req, res) => {
   }
 };
 
-// POST /api/messager/createNewChat { recipientId: "..." }
+// POST /api/messager/createNewChat
 exports.createNewChat = async (req, res) => {
-  console.log('🔄 [createNewChat] Попытка создания нового чата');
+  console.log('🔄 [createNewChat] Запрос на создание чата');
   try {
     const { recipientId } = req.body;
-    console.log('📥 [createNewChat] Получен recipientId:', recipientId);
+    const currentUserId = req.user._id;
 
     if (!recipientId) {
-      console.warn('⚠️ [createNewChat] recipientId не указан');
       return res.status(400).json({ error: 'recipientId required' });
     }
 
-    const recipient = await User.findById(recipientId);
+    if (recipientId.toString() === currentUserId.toString()) {
+      return res.status(400).json({ error: 'Cannot chat with yourself' });
+    }
+
+    const recipient = await User.findById(recipientId, '_id');
     if (!recipient) {
-      console.warn('⚠️ [createNewChat] Получатель не найден по ID:', recipientId);
       return res.status(404).json({ error: 'Recipient not found' });
     }
 
-    console.log('👤 [createNewChat] Роль текущего пользователя:', req.user.role);
-    console.log('👤 [createNewChat] Роль получателя:', recipient.role);
+    // 🔑 Канонический порядок: меньший ID → participant1
+    const ids = [currentUserId.toString(), recipientId.toString()].sort();
+    const participant1 = new mongoose.Types.ObjectId(ids[0]);
+    const participant2 = new mongoose.Types.ObjectId(ids[1]);
 
-    if (req.user.role === recipient.role) {
-      console.warn('⚠️ [createNewChat] Запрещено создавать чат между пользователями одной роли');
-      return res.status(400).json({ error: 'Chats allowed only between client and realtor' });
-    }
+    // Поиск существующего чата
+    let chat = await Chat.findOne({ participant1, participant2 });
 
-    // Сортируем ID для уникальности
-    const participants = [req.user._id, recipient._id]
-      .map(id => id.toString())
-      .sort()
-      .map(id => new mongoose.Types.ObjectId(id));
-
-    console.log('👥 [createNewChat] Участники чата (отсортированы):', participants.map(p => p.toString()));
-
-    let chat = await Chat.findOne({ participants });
     if (!chat) {
       console.log('🆕 [createNewChat] Чат не найден — создаём новый');
-      chat = new Chat({ participants, messages: [] });
+      chat = new Chat({ participant1, participant2, messages: [] });
       await chat.save();
-      console.log('✅ [createNewChat] Новый чат сохранён с ID:', chat._id.toString());
+      console.log('✅ [createNewChat] Новый чат создан:', chat._id);
 
-      // Добавляем chat._id в chatIds обоих пользователей
-      await User.updateOne(
-        { _id: req.user._id },
-        { $addToSet: { chatIds: chat._id } }
-      );
-      await User.updateOne(
-        { _id: recipient._id },
-        { $addToSet: { chatIds: chat._id } }
-      );
-      console.log('✅ [createNewChat] chatId добавлен в профили обоих пользователей');
+      // Обновляем chatIds у пользователей
+      await Promise.all([
+        User.updateOne({ _id: currentUserId }, { $addToSet: { chatIds: chat._id } }),
+        User.updateOne({ _id: recipientId }, { $addToSet: { chatIds: chat._id } })
+      ]);
     } else {
-      console.log('🔄 [createNewChat] Чат уже существует с ID:', chat._id.toString());
-
-      // Защита от рассинхронизации chatIds
-      const updates = [];
-      const currentUserChatIds = req.user.chatIds?.map(id => id.toString()) || [];
-      const recipientChatIds = recipient.chatIds?.map(id => id.toString()) || [];
-
-      if (!currentUserChatIds.includes(chat._id.toString())) {
-        console.log('🔧 [createNewChat] Добавляем chatId в профиль текущего пользователя');
-        updates.push(
-          User.updateOne(
-            { _id: req.user._id },
-            { $addToSet: { chatIds: chat._id } }
-          )
-        );
-      }
-      if (!recipientChatIds.includes(chat._id.toString())) {
-        console.log('🔧 [createNewChat] Добавляем chatId в профиль получателя');
-        updates.push(
-          User.updateOne(
-            { _id: recipient._id },
-            { $addToSet: { chatIds: chat._id } }
-          )
-        );
-      }
-      if (updates.length) {
-        await Promise.all(updates);
-        console.log('✅ [createNewChat] Выполнено обновление chatIds для рассинхронизированных пользователей');
-      }
+      console.log('🔄 [createNewChat] Чат уже существует:', chat._id);
     }
 
-    console.log('📤 [createNewChat] Отправка ответа с chatId:', chat._id.toString());
     res.json({ chatId: chat._id.toString() });
   } catch (err) {
+    if (err.code === 11000) {
+      // Race condition: повторно найдём чат
+      const ids = [req.user._id.toString(), req.body.recipientId.toString()].sort();
+      const participant1 = new mongoose.Types.ObjectId(ids[0]);
+      const participant2 = new mongoose.Types.ObjectId(ids[1]);
+      const chat = await Chat.findOne({ participant1, participant2 });
+      if (chat) {
+        return res.json({ chatId: chat._id.toString() });
+      }
+    }
     console.error('❌ [createNewChat] Ошибка:', err);
     res.status(500).json({ error: 'Failed to create chat' });
   }

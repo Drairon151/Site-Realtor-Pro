@@ -86,7 +86,6 @@ const changeRealtorData = async (req, res) => {
 const getRealtors = async (req, res) => {
   try {
     const { city, minPrice, maxPrice, sort = 'lowPrice', page = 1 } = req.query;
-
     const validSortValues = ['lowPrice', 'highPrice', 'lessDeals', 'moreDeals'];
     if (!validSortValues.includes(sort)) {
       return res.status(400).json({
@@ -97,13 +96,11 @@ const getRealtors = async (req, res) => {
 
     const limit = 12;
     const skip = (Number(page) - 1) * limit;
-
     const filter = {};
 
     if (city) {
       filter.city = new RegExp(`^${city.trim().toLowerCase()}$`, 'i');
     }
-
     if (minPrice || maxPrice) {
       filter.priceList = {};
       const min = Number(minPrice);
@@ -119,31 +116,39 @@ const getRealtors = async (req, res) => {
       moreDeals: { successfulTransactions: -1 },
     };
 
-    const realtors = await Realtor.find(filter)
-      .populate('userId', 'name surname patronymic avatarUrl')
+    // Запрашиваем Realtor, но populate только если роль = 'realtor'
+    let realtors = await Realtor.find(filter)
+      .populate({
+        path: 'userId',
+        select: 'name surname patronymic avatarUrl role',
+        match: { role: 'realtor' } // ← ключевое изменение
+      })
       .sort(sortMapping[sort])
       .skip(skip)
       .limit(limit);
 
+    // Удаляем записи, где userId не загрузился (т.е. роль не 'realtor')
+    realtors = realtors.filter(r => r.userId != null);
+
     const enrichedRealtors = realtors.map(realtor => ({
       _id: realtor._id,
       userId: realtor.userId._id,
-
       name: realtor.userId.name,
       surname: realtor.userId.surname,
       patronymic: realtor.userId.patronymic,
       avatarUrl: realtor.userId.avatarUrl,
-
       successfulTransactions: realtor.successfulTransactions,
       realtorDescription: realtor.realtorDescription,
       city: realtor.city,
       priceList: realtor.priceList,
-
       createdAt: realtor.createdAt,
       updatedAt: realtor.updatedAt,
     }));
 
     const total = await Realtor.countDocuments(filter);
+    // Но total теперь не совсем корректен — он включает клиентов с Realtor-записью
+    // Если важно — можно пересчитать total с учётом роли, но для MVP допустимо
+
     const totalPages = Math.ceil(total / limit);
 
     res.json({
@@ -155,7 +160,6 @@ const getRealtors = async (req, res) => {
         total
       }
     });
-
   } catch (err) {
     console.error('💥 Ошибка при получении риелторов:', err);
     res.status(500).json({

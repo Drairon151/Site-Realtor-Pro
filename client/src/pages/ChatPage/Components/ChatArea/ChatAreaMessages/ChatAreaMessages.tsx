@@ -1,7 +1,6 @@
-// import { useState } from 'react'
-
+import { useState ,useEffect, useRef } from 'react'
 import { useUserContext } from '../../../../../context/UserContext'
-import { UserChatData } from '../../../../../types/messager/UserChatData'
+import { UserChatData } from '../../../../../types/messager/userChatData'
 import userChatInfo from '../../../../../types/messager/userChatInfo'
 import './ChatAreaMessages.css'
 import ChatMessage from './ChatMessage/ChatMessage'
@@ -23,8 +22,38 @@ export default function ChatAreaMessages({ chatsMessages, currentChat }: ChatAre
 
     const {user} = useUserContext()
 
+    const messagesStartRef = useRef<HTMLDivElement>(null)
+    const messagesEndRef = useRef<HTMLDivElement>(null)
+    const [userOnLastMessage, setUserOnLastMessage] = useState(true)
+
+    const chatScrollHandler = ()=>{
+        if(!messagesStartRef.current || !messagesEndRef.current)return
+        messagesStartRef.current.scrollTop = messagesStartRef.current.scrollHeight
+    }
+
+    const isScrolledToBottom = () => {
+        if(!messagesStartRef.current || !messagesEndRef.current)return
+        
+        setUserOnLastMessage(
+            messagesStartRef.current.scrollTop
+            +
+            messagesStartRef.current.clientHeight 
+            >= 
+            messagesStartRef.current.scrollHeight - 1
+        )
+    };
+
+    useEffect(()=>{
+        if(userOnLastMessage){
+            chatScrollHandler()
+        }
+    },[chatData.chatHistory])
+
     return (
-        <div className='chat-area_messages'>
+        <div className='chat-area_messages'
+            ref={messagesStartRef}
+            onScroll={isScrolledToBottom}
+        >
             {chatData.chatHistory.map(message => (
                 <ChatMessage
                     key={message.messageId}
@@ -36,6 +65,9 @@ export default function ChatAreaMessages({ chatsMessages, currentChat }: ChatAre
                     }
                 />
             ))}
+            <div
+                ref={messagesEndRef}
+            ></div>
         </div>
     );
 }

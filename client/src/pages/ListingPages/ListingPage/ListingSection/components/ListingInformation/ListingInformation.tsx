@@ -1,3 +1,4 @@
+import useMessanger from "../../../../../../hooks/useMessanger";
 import { Listing } from "../../../../../../types/listing";
 
 import './ListingInformation.css'
@@ -12,7 +13,9 @@ interface ListingInformation{
 
 export default function ListingInformation({listingId,listing,listingAuthorPhone,getListingAuthorPhone}:ListingInformation){
 
-    
+    const {
+        createNewChat
+    } = useMessanger()
 
     return(
         <div className="listing-information">
@@ -61,7 +64,11 @@ export default function ListingInformation({listingId,listing,listingAuthorPhone
 
             <div className="listing-information_buttons flex center">
                 <button className="listing-info_button listing-info_button--numberPhone"
-                    onClick={()=>getListingAuthorPhone(listingId)}
+                    onClick={
+                        !listingAuthorPhone
+                        ?()=>getListingAuthorPhone(listingId)
+                        :()=>{}
+                    }
                 >
                     { !listingAuthorPhone 
                         ? 'Узнать номер'
@@ -69,7 +76,10 @@ export default function ListingInformation({listingId,listing,listingAuthorPhone
                     }
                 </button>
 
-                <button className="listing-info_button listing-info_button--writeSeller">
+                <button 
+                    className="listing-info_button listing-info_button--writeSeller"
+                    onClick={()=>createNewChat(listing.realtor_id)}    
+                >
                     Написать продавцу
                 </button>
             </div>
