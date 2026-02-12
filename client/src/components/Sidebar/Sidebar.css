@@ -1,0 +1,37 @@
+.sidebar{
+    position: fixed;
+    width: 150px;
+    height: 100%;
+    background-color: black;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.sidebar_nav-button{
+    font-size: 20px;
+
+    padding: 5px;
+    background-color: white;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.5s;
+
+}
+
+.sidebar_nav-button:first-child{
+    margin-top:50px ;
+}
+
+.sidebar_nav-button:hover{
+    background-color: aquamarine;
+    padding: 10px;
+
+    transition: 0.5s;
+}
+
+.sidebar_nav-button--active{
+    background-color: #d72e2e;
+    transition: 0.5s;
+}

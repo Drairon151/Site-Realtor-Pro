@@ -1,0 +1,10 @@
+.emal-auth-form{
+    margin-top: 300px;
+}
+
+.emal-auth-form_buttons{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}

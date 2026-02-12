@@ -1,0 +1,79 @@
+.create-listing-form{
+    /* margin-top: 100px; */
+}
+
+.create-listing-form_lable{
+
+}
+
+.create-listing-form_input{
+    border-radius: 5px;
+    border: 2px solid black;
+
+}
+
+.create-listing-form_textarea{
+
+    border-radius: 5px;
+    border: 2px solid black;
+
+    resize: none;
+
+}
+
+.create-listing-form--error{
+    border: 2px solid red;
+}
+
+.create-listing-form_input-price{
+    width: 95%;
+}
+
+.create-listing-form_currency{
+    margin-left: 5px;
+}
+
+.create-listing-form_lable--photos{
+    display: inline-block;
+    padding: 8px 16px;
+    background: #000000;
+    color: white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.create-listing-form_input--photos{
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.photos-error-message{
+    color: red;
+    font-size: 10px;
+}
+
+.user-photos{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+}
+
+.user-photos_item{
+    /* position: relative; */
+
+    width: 100px;
+    height: 100px;
+}
+
+.user-photos_img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-photos_button{
+    position: absolute;
+}

@@ -1,0 +1,31 @@
+.realtors-page_realtor-card-section{
+    padding-bottom: 200px;
+}
+
+.realtor-filter{
+
+    z-index: 1;
+
+    top: 100px;
+    margin-bottom: 100px;
+    position: sticky;
+    background-color: #9c9c9c;
+}
+
+.realtor-filter_element{
+    border-radius: 5px;
+    padding: 5px;
+    margin: 10px;
+}
+
+.realtor-filter_wrapper--select{
+    margin-left: 20px;
+}
+
+.realtor-filter_img--sort-icon{
+    width: 20px;
+}
+
+.realtor-card-wrapper{
+    margin-top: 40px;
+}

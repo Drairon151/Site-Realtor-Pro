@@ -1,0 +1,35 @@
+.my-listings-section{
+    padding-bottom: 200px;
+    padding-top: 100px;
+}
+
+.listing-card_edit--buttons{
+    width: 100px;
+}
+
+.listing-cards{
+    padding-top: 100px;
+}
+
+.listing-card_edit{
+    padding:20px
+}
+
+.listing-card_edit--button{
+    margin: 20px;
+    border-radius: 15px;
+    width: 100px;
+    height: 100px;
+}
+
+.listing-card_edit--button.delete{
+    background-color: rgb(250, 93, 93);
+}
+
+.listing-card_edit--button.edit{
+    background-color: rgb(57, 251, 109);
+}
+
+.listing-card_edit--button-img{
+    width: 100%;
+}

@@ -1,0 +1,403 @@
+import { useState, useEffect, FormEvent } from "react";
+import { useNavigate } from 'react-router-dom';
+import {User} from '../types/user'
+import photoValidator from "../utils/photoValidator";
+
+export default function useUser(){
+    const navigate = useNavigate()
+
+    interface MeResponse {
+        user: User;
+    }
+
+    interface EmailVerificationStatus{
+        status: string,
+        type: string,
+    }
+
+    interface ResultUpdateUserField{
+        status: string,
+        updatedField: keyof User,
+        updatedValue: string,
+    }
+
+    interface changePasswordStatus{
+        status: string,
+        type:string, 
+        message:string
+      }
+
+    const [user, setUser] = useState<User | null>(null)
+
+    const [emailVerificationStatus, setEmailVerificationStatus] = useState<EmailVerificationStatus>({
+        status:'code-not-success',
+        type:'',
+    });
+
+
+    const API_USER: string = 'http://localhost:5000/api/user';
+    const [cooldownTimer, setCooldownTimer] = useState<number>(0);
+    const [userAuthorized, setUserAuthorized] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [userLoading, setUserLoading] = useState<boolean>(false);
+    const [changePasswordStatus, setChangePasswordStatus] = useState<changePasswordStatus|null>(null)
+
+    
+    const checkAuth = async () => {
+        setUserLoading(true)
+        setUserAuthorized(false)
+
+        try {
+
+            const response = await fetch('http://localhost:5000/api/me', {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+
+                try{
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка проверки авторизации')
+                }catch{
+                    throw new Error(`HTTP ${response.status} ${response.statusText}`)
+
+                }
+
+            }
+
+            const result = await response.json() as MeResponse;
+            setUserAuthorized(true)
+            // console.log('Успешная авторизацию ', result.user)
+            setUser(result.user);
+        }catch(error){
+            if (error instanceof Error) {
+                console.log(error.message);
+            } else {
+                console.log('Ошибка:', error);
+            }
+            setUserAuthorized(false)
+
+        }finally{
+            setUserLoading(false)
+
+        }
+    };
+
+    useEffect(()=>{
+
+        checkAuth()
+    
+    },[])
+
+    const verifyCodeChangePassword = async(event: FormEvent<HTMLFormElement>) =>{
+        event.preventDefault()
+        
+        setIsLoading(true)
+
+        const formData = new FormData(event.currentTarget);
+
+        try{
+
+            if(!user){
+                throw new Error('Пользователь не авторизован')   
+            }
+
+            const userData = {
+                _id: user._id,
+                code: formData.get('emailCode'),
+            };
+
+            const response = await fetch(`${API_USER}/change-password`,{
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+                credentials: 'include',
+            })
+            
+            if (!response.ok) {
+
+                try{
+                    const errorData = await response.json();
+                    setEmailVerificationStatus({
+                        status: errorData.status,
+                        type: errorData.type,
+                    })
+                    throw new Error(errorData.message || 'Ошибка отправки кода подтверждения на сервер')
+                }catch{
+                    throw new Error(`HTTP ${response.status} ${response.statusText}`)
+
+                }
+
+            }
+
+            setEmailVerificationStatus({status: 'code-success' , type: 'success'})
+        }catch(error){
+            if (error instanceof Error) {
+                console.log(error.message);
+            } else {
+                console.log('Ошибка:', error);
+            }
+        }finally{
+            
+            setIsLoading(false)
+        }
+    }
+
+    const changePassword = async(event: FormEvent<HTMLFormElement>)=>{
+        event.preventDefault()
+
+        setIsLoading(true)
+        const formData = new FormData(event.currentTarget);
+        if(!user){
+            throw new Error('Пользователь не авторизован')   
+        }
+
+        const userData = {
+            _id: user._id,
+            oldPassword: formData.get('oldPassword'),
+            newPassword: formData.get('newPassword'), 
+        }
+        try{
+            const response = await fetch(`${API_USER}/change-password`, {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+
+                try{
+                    const errorData = await response.json();
+                    setChangePasswordStatus(errorData)
+
+                    throw new Error(errorData.message || 'Ошибка смены пароля')
+                }catch{
+                    throw new Error(`HTTP ${response.status} ${response.statusText}`)
+
+                }
+
+            }
+
+            setChangePasswordStatus(null)
+            console.log('Пароль успешно обновлён')
+            navigate('/', { replace: true });
+
+        }catch(error){
+            if (error instanceof Error) {
+                console.log(error.message);
+            } else {
+                console.log('Ошибка:', error);
+            }
+        }finally{
+            setIsLoading(false)
+        }
+
+    }
+
+    const sendVerifyCodeChangePassword = async ()=>{
+        setIsLoading(true)
+        try{
+            if(!user){
+                throw new Error('Пользователь не авторизован')   
+            }
+
+            const response = await fetch(`${API_USER}/send-password-reset-code`, {
+                method: 'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                },
+                body: JSON.stringify({ _id: user._id }),
+                credentials: 'include',
+            });
+            if (!response.ok) {
+
+                try{
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка запроса на отправление кода подтверждения')
+                }catch{
+                    throw new Error(`HTTP ${response.status} ${response.statusText}`)
+
+                }
+
+            }
+            setEmailVerificationStatus({
+                status: 'code-not-success',
+                type: 'wait',
+            })
+        }catch(error){
+            if (error instanceof Error) {
+                console.log(error.message);
+            } else {
+                console.log('Ошибка:', error);
+            }
+        }
+    }
+
+    const resendVerifyCodeChangePassword = async(event: React.MouseEvent<HTMLButtonElement>)=>{
+        setIsLoading(true)
+        event.preventDefault()
+
+        setIsLoading(true)
+        if(!user){
+            throw new Error('Пользователь не авторизован')   
+        }
+
+        const userData = {
+            _id: user._id
+        };
+
+
+        try{
+            const response = await fetch(`${API_USER}/resend-password-reset-code`,{
+                method: 'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify(userData),
+                credentials: 'include',
+            })
+
+            if (!response.ok) {
+
+                try{
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка подтверждения кода')
+                }catch{
+                    throw new Error(`HTTP ${response.status} ${response.statusText}`)
+
+                }
+
+            }
+            
+            const result = await response.json()
+            setCooldownTimer(result.cooldown);
+        }catch(error){
+            if (error instanceof Error) {
+                console.log(error.message);
+            } else {
+                console.log('Ошибка:', error);
+            }
+        }finally{
+            setIsLoading(false)
+        }
+
+    };
+
+    const updateUserField = async (name:string, value:string)=>{
+
+        try{
+            
+            const response = await fetch(`${API_USER}/update-user-field`,{
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    updatedField: name,
+                    updatedValue: value,
+                }),
+                credentials: 'include',
+            })
+
+            if (!response.ok) {
+
+                try{
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка запроса на изменение данных')
+                }catch{
+                    throw new Error(`HTTP ${response.status} ${response.statusText}`)
+
+                }
+
+            }
+
+            const result:ResultUpdateUserField = await response.json()
+            
+            setUser(prev => {
+                if (!prev) return null;
+
+                return {
+                    ...prev,
+                    [result.updatedField]: result.updatedValue,
+                } as User;
+            });
+
+            console.log('Обновлённые данные ',result.updatedField,' : ',result.updatedValue)
+
+
+
+            }catch(error){
+                if (error instanceof Error) {
+                    console.log(error.message);
+                } else {
+                console.log('Ошибка:', error);
+                }
+            }
+        }
+
+        const changeUserPhoto = async (newPhoto:FileList)=>{
+            try{
+                const validPhoto = photoValidator(newPhoto)
+
+                if(validPhoto.photoErrorStatus.length>0){
+                    throw new Error('Неккоректный тип файла') 
+                }
+
+                const formData = new FormData();
+                formData.append('avatar', validPhoto.validFiles[0]);
+                console.log('Проверка: ', validPhoto.validFiles[0])
+                const response = await fetch(
+                    `${API_USER}/change-user-photo`,
+                    {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'include',
+                    }
+                )
+
+                if(!response.ok){
+                    const errorData = await response.json();
+                    throw new Error(errorData.message ||'Ошибка обновления фото')
+                }
+
+            }catch(error){
+                console.log('Ошибка:',error)
+            }
+
+        }
+
+
+    return {
+        user,
+        setUser,
+        checkAuth,
+        
+        cooldownTimer,
+        setCooldownTimer,
+
+        isLoading, 
+        setIsLoading,
+
+        emailVerificationStatus,
+        
+        changePassword,
+        changePasswordStatus,
+        verifyCodeChangePassword,
+        sendVerifyCodeChangePassword,
+        resendVerifyCodeChangePassword,
+
+        updateUserField,
+        
+        userLoading,
+        userAuthorized,
+        setUserAuthorized,
+
+        changeUserPhoto,
+    }
+}

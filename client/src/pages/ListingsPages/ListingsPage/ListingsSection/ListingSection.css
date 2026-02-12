@@ -1,0 +1,50 @@
+.listings-section{
+    padding-bottom: 200px;
+    padding-top: 100px;
+}
+
+.listings{
+
+}
+
+.listing-filter{
+    z-index: 1;
+    top: 100px;
+    margin-bottom: 100px;
+    position: sticky;
+    background-color: #9c9c9c;
+}
+
+.listing-filter_element{
+    border-radius: 5px;
+    padding: 5px;
+    margin: 10px;
+}
+
+.listing-filter_input{
+
+}
+
+.listing-filter_wrapper--select{
+    margin-left: 20px;
+}
+
+.listing-filter_img--sort-icon{
+    width: 20px;
+}
+
+.listing-filter_select{
+}
+
+.listing-filter_option{
+
+}
+
+.button_load-more{
+    margin-top: 100px;
+    
+    padding: 10px;
+    border-radius: 15px;
+    background-color: black;
+    color: white;
+}
